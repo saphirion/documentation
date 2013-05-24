@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<style type="text/css">@media screen { h1,h2,h3,h4,h5,p,a,br,li,td, .underline {font-family:Arial, Helvetica, sans-serif;text-align:justify} body {font-size:11pt;line-height:1.3em} h1 {font-size:18pt} h2 {font-size:15pt} h3 {font-size:13pt} h4 {font-size:12pt} h5 {font-size:11pt} hr {text-align:center;height:1px;border:none;background:black} ol,ul,p,table {margin-left:3em;margin-right:3em} a {text-decoration:none} a:hover {text-decoration:underline} img {} .defword {width:25%} .defexplain {} .defexplain p {padding:0em;margin:0em} .deftablepara {} .deftable {width:85%;padding-left:1em;border-style:none;vertical-align:top} .deftable td {text-align:left;vertical-align:top} .deftablefaq {border-style:solid;border-width:thin} .stdtable {border:1px solid;background:black} .stdtable th {padding:0.5em;background:#EEEEEE;font-family:Arial, Helvetica, sans-serif;font-weight:bold;text-align:center} .stdtable td {padding:0.5em;background:white;text-align:left;vertical-align:top} .end {font-size:8pt} .example {margin-left:3em;margin-right:3em;border:1px solid;padding:1em;background-color:#EEEEEE} .header {margin-left:3em;margin-right:3em;border:1px solid;padding:1em;background-color:#FFFFEE} .indented {margin-left: 50px} .litable {text-align:left} .new {border-right:10px solid;padding-right:10px;font-family:Arial} .note {margin:0.5em 3em 0.5em 3em;border:1px solid;padding:0em;background-color:#F0F0A0} .note .title {font-family:sans-serif;font-weight:bold;margin:0.5em} .note .message {margin:0.5em 1.5em 0.5em 1.5em;padding:0em} .note .message p {padding:0em;margin:1em 0em 1em 0em} .reference {} .caption {font-size:10pt;text-align:center;font-style:italic} .todolist {padding:0.5em;font-size:10pt} .todolist p {margin:0em 3em 0em 3em} .todo {margin:1em 3em 1em 3em;padding:0.5em;border:solid 2px black;background:#FFAAAA;font-size:8pt} .todo p {margin:0.2em 1em 0.2em 1em} .inline {margin:0.5em 3em 0.5em 3em;border:solid 1px;padding:0em;background-color:#EEEEEE} .inline .title {font-family:sans-serif;font-weight:bold;margin:0.5em} .inline .elements {font-size:10pt;margin:0em 0em 0.5em 0em;padding:0em 1em 0em 1em} .inline .elements p {display:inline-table;margin:0.25em 0.5em 0.25em 0.5em} .tocindent {margin-left: 2em} .top {font-size:8pt;text-align:right} .underline {text-decoration:underline} } @media print { h1,h2,h3,h4,h5,p,a,br,li, #underline {font-family:Arial;text-align:justify;orphans:5;widows:5} p,li,td {font-size:10pt} ul,ol {page-break-after:avoid;orphans:5;widows:5} }</style><title>R3 GUI Actors</title></head><body onload="window.location.hash = window.location.hash"><a id="top" name="top"></a><h2>R3 GUI Actors</h2><pre class="example">Author: Carl Sassenrath, Saphirion AG
+Date: 20-Jan-2013</pre><hr /><h2>Contents</h2><div class="tocindent"><a href="#sect1"><strong>1. Concept</strong></a><br /><a href="#sect2"><strong>2. Defining Actors</strong></a><br /><div class="tocindent"><a href="#sect2.1"><strong>2.1 Actor Arguments</strong></a><br /><a href="#sect2.2"><strong>2.2 Inherited Actors</strong></a><br /><a href="#sect2.3"><strong>2.3 Accessing Facets</strong></a><br /></div><a href="#sect3"><strong>3. Standard Actor Names</strong></a><br /><a href="#sect4"><strong>4. Default Actors</strong></a><br /><a href="#sect5"><strong>5. Calling an Actor</strong></a><br /><a href="#sect6"><strong>6. Actors for Initialization</strong></a><br /><div class="tocindent"><a href="#sect6.1"><strong>6.1 on-make</strong></a><br /><a href="#sect6.2"><strong>6.2 on-init</strong></a><br /><a href="#sect6.3"><strong>6.3 on-attach</strong></a><br /></div><a href="#sect7"><strong>7. Actors for Events</strong></a><br /><div class="tocindent"><a href="#sect7.1"><strong>7.1 on-attached</strong></a><br /><a href="#sect7.2"><strong>7.2 on-click</strong></a><br /><a href="#sect7.3"><strong>7.3 on-drag</strong></a><br /><a href="#sect7.4"><strong>7.4 on-drag-over</strong></a><br /><a href="#sect7.5"><strong>7.5 on-drop</strong></a><br /><a href="#sect7.6"><strong>7.6 on-focus</strong></a><br /><a href="#sect7.7"><strong>7.7 on-key</strong></a><br /><a href="#sect7.8"><strong>7.8 on-move</strong></a><br /><a href="#sect7.9"><strong>7.9 on-over</strong></a><br /><a href="#sect7.10"><strong>7.10 on-resize</strong></a><br /><a href="#sect7.11"><strong>7.11 on-scroll</strong></a><br /><a href="#sect7.12"><strong>7.12 on-scroll-event</strong></a><br /></div><a href="#sect8"><strong>8. Actors for Value Control</strong></a><br /><div class="tocindent"><a href="#sect8.1"><strong>8.1 on-get</strong></a><br /><a href="#sect8.2"><strong>8.2 on-set</strong></a><br /><a href="#sect8.3"><strong>8.3 on-clear</strong></a><br /><a href="#sect8.4"><strong>8.4 on-reset</strong></a><br /></div><a href="#sect9"><strong>9. Other Actors</strong></a><br /><div class="tocindent"><a href="#sect9.1"><strong>9.1 on-draw</strong></a><br /></div></div><h2><a id="sect1" name="sect1">1. Concept</a></h2><p>An <em>actor</em> implements a style function.</p><p>If you think of a style as an object <em>class</em>, its actors are like the <em>methods</em>, and they operate on the instance of that class, the face object. Essentially, they are functions that are reused for each instance of a style, each face.</p><p>We call them <em>actors</em> because they are are not true methods and are similar to the actor functions used in <em>schemes</em>.</p><div class="note"><div class="message"><p>This document is is for advanced users who plan to implement their own styles and need to provide new functions for rendering, input, or other control. Casual GUI users do not need to know about actors.</p></div></div><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect2" name="sect2">2. Defining Actors</a></h2><p>GUI styles define actors to provide functions that handle events, process input, modify attributes, and setup graphics rendering.</p><p>Within a style an w:actor block holds the actor definitions. The block is a collection of actor names followed by their function body blocks. No function creators or argument specifications are needed, the f:make-style function will create those.</p><p>The naming convention for actors begins with w:on- followed by a verb or verb-noun that best describes the action. Examples are: w:on-draw or w:on-view. Although not strictly required, using this convention helps make GUI code more clear.</p><p>Here's an example actors block as it would look within a style definintion:</p><pre class="example">actors: [
+    on-make: [
+        ...
+    ]
+    on-update: [
+        ...
+    ]
+    on-resize: [
+        ...
+    ]
+    on-scroll: [
+        ...
+    ]
+    on-over: [
+        ...
+    ]
+]</pre><p>Here is a complete style definition of w:clicker, the base-style that implements buttons.</p><pre class="example">clicker: [
+
+    about: &quot;Single-action button without text. Basis of other styles.&quot;
+
+    tags: [internal]
+
+    facets: [
+        init-size: 28x28
+        bg-color: 80.100.120
+        border-color: 0.0.0.128
+
+        pen-color: ; set by on-draw
+        area-fill: ; set by on-draw
+        material: 'chrome
+        focus-color: guie/colors/focus
+        draw-mode: 'normal
+        materials: none
+        face-width: none
+    ]
+
+    options: [
+        face-width: [integer!]
+        init-size: [pair!]
+        bg-color: [tuple!]
+    ]
+
+    state: [
+        validity: none
+    ]
+
+    draw: [ 
+        normal: [
+            pen pen-color
+            line-width 1
+            grad-pen linear 1x1 0 (viewport-box/bottom-right/y) 90 area-fill
+            box 1x1 (viewport-box/bottom-right - 2) 1
+        ]
+        focus: [
+            fill-pen focus-color
+            box -1x-1 viewport-box/bottom-right 5
+            pen pen-color
+            line-width 1
+            grad-pen linear 1x1 0 (viewport-box/bottom-right/y) 90 area-fill
+            box 1x1 (viewport-box/bottom-right - 2) 1
+        ]
+    ]
+    actors: [
+        on-make: [
+            if face/facets/face-width [
+                face/facets/init-size/x: face/facets/min-size/x: face/facets/max-size/x: face/facets/face-width
+            ]
+        ]
+    
+        on-init: [
+            set-facet face 'materials make-material face get-facet face 'material
+        ]
+        
+        on-draw: [
+            set-material face face/state/mode
+            color: get-facet face 'border-color
+            if face/state/mode = 'over [color: color / 2]
+            face/facets/pen-color: color
+            arg ; return draw block
+        ]
+
+        on-over: [ ; arg: offset or none
+            face/state/mode: pick [over up] face/state/over: not not arg
+            draw-face face
+        ]
+
+        on-click: [ ; arg: event
+            face/state/mode: arg/type
+            if 'up = face/state/mode [face/state/mode: 'over]
+            draw-face face
+            if arg/type = 'up [
+                focus face
+                do-face face
+            ]
+            true ;don't do unfocus
+        ]
+        
+        on-focus: [ ; arg/1: TRUE for focus, FALSE for unfocus; arg/2 - forced re-focus flag
+            set-facet face 'draw-mode either get arg/1 ['focus]['normal]
+            set-facet face 'focus-color either get arg/1 [guie/colors/focus][255.255.255.255]
+            draw-face face
+        ]
+        
+        on-key: [ ; arg: event
+            if arg/type = 'key [
+                switch arg/key [
+                    #&quot; &quot; [
+                        do-face face
+                    ]
+                ]
+            ]
+        ]
+
+        on-validate: [
+            face/state/validity: validate-face face
+        ]
+    ]
+]</pre><h3><a id="sect2.1" name="sect2.1">2.1 Actor Arguments</a></h3><p>Actor arguments are fixed and standardized. The arguments are:</p><div><table class="stdtable" border="0" cellpadding="0" cellspacing="1"><tr><td>face </td><td>The face upon which the actor acts. </td></tr><tr><td>arg </td><td>A single value or block of multiple values.</td></tr></table></div><p>When an actor is called, argument values are passed to the actor body block. Local variables can be defined using set-words (same way as in FUNCT method).</p><h3><a id="sect2.2" name="sect2.2">2.2 Inherited Actors</a></h3><p>When a style is derived from another style its actors are inherited.</p><p>It should be the derived actors are not bound to any particular style, but are simple functions. This allows actors to be efficiently reused in all instances of a face object.</p><p>For example, w:button uses the w:clicker actors here:</p><pre class="example">button: clicker [
+    
+    about: &quot;Single action button with text.&quot;
+    
+    tags: [action tab]
+    
+    facets: [
+        init-size: 130x24
+        text: &quot;Button&quot;
+        text-style: 'button
+        max-size: 260x24
+        min-size: 24x24
+        text-size-pad: 20x0
+    ]
+    
+    options: [
+        text: [string! block!]
+        bg-color: [tuple!]
+        init-size: [pair!]
+        face-width: [integer! issue!]
+    ]
+    
+    actors: [
+        on-make: [
+            either face/facets/face-width = #auto [
+                face/facets/max-size:
+                face/facets/init-size: face/facets/text-size-pad + as-pair first font-text-size? face-font? face face/facets/text 24
+            ][
+                do-actor/style face 'on-make arg 'clicker           
+            ]
+        ]
+        
+        on-set: [
+            if arg/1 = 'value [
+                face/facets/text: form any [arg/2 &quot;&quot;]
+                show-later face
+            ]
+        ]
+        on-get: [
+            if arg = 'value [
+                face/facets/text
+            ]
+        ]
+        on-draw: [
+            t: get-facet face 'text
+            ; limit-text-size modifies, so we need to copy
+            ; size is made 20px smaller to incorporate &quot;...&quot; (see text-size-pad)
+            l: limit-text-size copy/deep t face/gob/size - face/facets/text-size-pad face-font? face
+            set-facet face 'text-body either equal? t l [t][join l &quot;...&quot;]
+            do-actor/style face 'on-draw arg 'clicker
+        ]
+    ]
+]</pre><p>Notice, no actor definitions from w:clicker are needed to be duplicated.</p><h3><a id="sect2.3" name="sect2.3">2.3 Accessing Facets</a></h3><p>For any given style a facet value may be stored in either the style object itself, or within the face instance. The location depends on whether the facet is static for all face instances, or changes for each instance.</p><p>Because you don't know and shouldn't care where it is stored, the f:get-facet function is provided to get the value and the f:set-facet function to set it.</p><p>For example, if the w:on-resize actor needs to know the size facet, it would use:</p><pre class="example">size: get-facet face 'size</pre><p>If the size is found in the w:face/facets object, that will be used. Otherwise, the w:style/facets object will be used.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect3" name="sect3">3. Standard Actor Names</a></h2><p>A number of actor names are predefined for standard actions, and we recommend that you use these for their equivalent actors within your GUI styles:</p><div><table class="stdtable" border="0" cellpadding="0" cellspacing="1"><tr><td>Actor </td><td>Description </td></tr><tr><td>on-make </td><td>when face is first created to initialize special values </td></tr><tr><td>on-click </td><td>when mouse button clicked on face </td></tr><tr><td>on-drag </td><td>when dragging inside a face </td></tr><tr><td>on-drag-over </td><td>when dragging and are over a target face </td></tr><tr><td>on-drop </td><td>when drag has stopped or when a file is dropped </td></tr><tr><td>on-focus </td><td>when we have been given or are losing focus </td></tr><tr><td>on-get </td><td>to fetch state values </td></tr><tr><td>on-set </td><td>when state values are set </td></tr><tr><td>on-clear </td><td>when the state values are cleared </td></tr><tr><td>on-key </td><td>when key has been pressed (for our focus) </td></tr><tr><td>on-move </td><td>when mouse has moved </td></tr><tr><td>on-over </td><td>when mouse passes over or away </td></tr><tr><td>on-reset </td><td>when reset is needed </td></tr><tr><td>on-resize </td><td>when size values have changed </td></tr><tr><td>on-update </td><td>when face contents have changed </td></tr><tr><td>on-draw </td><td>when system starts to draw the face (create DRAW block) </td></tr><tr><td>on-scroll </td><td>when scrolling is needed </td></tr><tr><td>on-scroll-event </td><td>when the mouse wheel is used </td></tr><tr><td>on-init </td><td>when face and its parent pane are ready (including initial sizing) </td></tr><tr><td>on-attach </td><td>when a face is attached <strong>from</strong> another face </td></tr><tr><td>on-attached </td><td>when a face is triggered in the attach reaction chain</td></tr></table></div><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect4" name="sect4">4. Default Actors</a></h2><p>A small number of actors are defined by default to work for all styles. They are:</p><div><table class="stdtable" border="0" cellpadding="0" cellspacing="1"><tr><td>Style </td><td>Description </td></tr><tr><td>on-resize </td><td>Recompute the area-size facet. </td></tr><tr><td>on-get </td><td>Return the face/state of a given name. </td></tr><tr><td>locate </td><td>A special actor to map an event to an offset position. </td></tr><tr><td>on-attached </td><td>By default sets the attached face value to the current face value.</td></tr></table></div><p>Style definitions are allowed to override these actors with their own definition specific to their operation.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect5" name="sect5">5. Calling an Actor</a></h2><p>There will be times when one actor function will call another. This is done with the f:do-actor function. Actors are always called this way, never directly.</p><p>For example:</p><pre class="example">do-actor face 'on-click true</pre><p>It should be noted that the call will be ignored if the face has no w:on-click actor.</p><p>Sometimes you can reuse actor code from another style to avoid duplicate code in multiple styles.</p><p>For example:</p><pre class="example">on-resize: [
+    ;call the standard on-resize code from FACE style
+    do-actor/style face 'on-resize arg 'face
+
+    ;here follows specific on-resize code for this style
+    ...
+]</pre><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect6" name="sect6">6. Actors for Initialization</a></h2><h3><a id="sect6.1" name="sect6.1">6.1 on-make</a></h3><p>The w:on-make actor is called when the face is created within the layout engine.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>none</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>This actor can be used to setup face facet values such as blocks of data, colors, face orientation, etc. and anything else unique to the face. If you are defining a compound style, this is a good actor to set-up any sub-faces.</p><p>It is not necessary to compute the face size within w:on-make because w:on-resize will be called later to do that.</p><p>Example that sets colors unique to the new face:</p><pre class="example">on-make: [
+    face/facets/colors: copy [255.255.255 128.128.128]
+]</pre><h3><a id="sect6.2" name="sect6.2">6.2 on-init</a></h3><p>The on-init actor is called when a new layout is created.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>none</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>When a new layout is created, the w:on-init actor will be called for each face within the layout. At this point the face objects exist and the layout has been initialized, including any special bindings.</p><p>It is also called for any trigger faces (special faces that act on w:when layout events.)</p><p>Resetting the face on initialization:</p><pre class="example">on-init: [
+    do-actor face 'on-reset
+]</pre><h3><a id="sect6.3" name="sect6.3">6.3 on-attach</a></h3><p>The w:on-attach actor is called when this face gets attached <strong>from</strong> another face.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>the face requesting attachment</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>Here is simple example hwo it works:</p><pre class="example">stylize [
+    node: box [
+        facets: [
+            text-style: 'title
+        ]
+        options: [
+            bg-color: [tuple!]
+            text-body: [string!]
+        ]
+        actors: [
+            on-attach: [
+                print [&quot;ON-ATTACH: Node&quot; face/name &quot;has been requested to attach from node&quot; arg/name rejoin [&quot;[&quot; arg/name &quot;-&gt;&quot; face/name &quot;]&quot;]]
+            ]
+        ]
+    ]
+]
+
+view [
+    A: node red &quot;Node A&quot; attach 'B
+    B: node green &quot;Node B&quot; attach 'A
+    C: node blue &quot;Node C&quot; attach 'A
+]</pre><p>You should see following output in the console:</p><pre class="example">ON-ATTACH: Node B has been requested to attach from node A [A-&gt;B]
+ON-ATTACH: Node A has been requested to attach from node B [B-&gt;A]
+ON-ATTACH: Node A has been requested to attach from node C [C-&gt;A]</pre><div class="note"><div class="message"><p>For easy access the face/targets field contains faces that are attached FROM the face.</p></div></div><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect7" name="sect7">7. Actors for Events</a></h2><h3><a id="sect7.1" name="sect7.1">7.1 on-attached</a></h3><p>The w:on-attached is called on every attached face. It is triggered by w:do-face function call sequence on a face that attaches to one or more face targets.</p><h3><a id="sect7.2" name="sect7.2">7.2 on-click</a></h3><p>The w:on-click is called each time a mouse button press or release occurs.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>the event object for the mouse click.</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>on down, can be none or the drag object. On up, none.</p></td></tr></table></div><p>This example prints the button event that occurred:</p><pre class="example">on-click: [
+    probe arg/type
+]</pre><p>w:on-click is also the precursor to dragging (holding down a mouse button, while moving the mouse), so you can create a drag object in w:on-click using the f:init-drag function. If you return the drag object the w:on-drag actor will be invoked.</p><pre class="example">on-click: [
+    if arg/type = 'down [
+        return init-drag face arg/offset
+    ]
+    none ; return value
+]</pre><h3><a id="sect7.3" name="sect7.3">7.3 on-drag</a></h3><p>The w:on-drag actor is called when the drag object is created or when the mouse is moving inside its target face.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>drag object (created earlier)</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>w:on-drag usually comes after w:on-click and ceases to be used when the drag object is destroyed, which happens right after on-drop.</p><p>Note that when a drag object exists, the w:on-move and w:on-over actors are not called.</p><p>Here is an example used by a slider that changes a value constantly during drag, updates its graphics, and calls its attached faces (if any).</p><pre class="example">on-drag: [ ; arg: drag
+    do-actor face 'on-offset arg/delta + arg/base
+    draw-face face
+    do-face face
+]</pre><h3><a id="sect7.4" name="sect7.4">7.4 on-drag-over</a></h3><p>The w:on-drag-over actor is called when the mouse is moving over a foreign face (not the target of the drag.)</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>Block of values related to the drag [drag-object offset ???]</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>Examples</p><pre class="example">on-drag-over: [
+    ; write this example
+]</pre><h3><a id="sect7.5" name="sect7.5">7.5 on-drop</a></h3><p>The w:on-drop actor is called when the drag operation is released.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>the drag object created earlier.</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>At the end of a drag operation, when one of the mouse buttons is released, the w:on-click action is called with the event, then w:on-drop is called.</p><p>After w:on-drop, the drag object is automatically destroyed. The w:on-drop actor is caleld regardless of whether the drag operation was started over this face or a different face.</p><p>The w:on-drop actor is also called if a file is dragged and dropped from the system desktop over the face. This is a special case.</p><p>Example:</p><pre class="example">on-drop: [
+    ; write an example here
+]</pre><h3><a id="sect7.6" name="sect7.6">7.6 on-focus</a></h3><p>The w:on-focus actor is called every time the face gains focus using the f:focus or f:next-focus function or loses focus with the f:unfocus function.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>true for focus and none for unfocus.</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>Nothing is called after w:on-focus, so if the face is changing appearance, a f:show-later should be called within the actor.</p><p>This example makes the background color yello (selection variation of yellow) when the face is focused and makes it white, when the face is unfocused:</p><pre class="example">on-focus: [
+    face/facets/bg-color: pick reduce [yello white] arg
+    draw-face face
+]</pre><h3><a id="sect7.7" name="sect7.7">7.7 on-key</a></h3><p>The w:on-key actor is called when a face has focus and a key is pressed.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>the input event</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>the same event</p></td></tr></table></div><p>The w:on-key actor has a default value for all faces, to return the event argument.</p><p>Simple keyboard navigation in a street map face:</p><pre class="example">on-key: [
+    if arg/type = 'key [ ;detect only &quot;key-down&quot; event types (use 'key-up for up events)
+        dx: dy: 0
+        switch arg/key [
+            right [dx: 1]
+            left  [dx: -1]
+            up    [dy: 1]
+            down  [dy: -1]
+        ]
+        if find arg/flags 'shift [
+            dx: dx * 3
+            dy: dy * 3
+        ]
+        move-map as-pair dx dy
+    ]
+    arg ; return same event
+]</pre><h3><a id="sect7.8" name="sect7.8">7.8 on-move</a></h3><p>The w:on-move actor is called every time the mouse moves.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>the event value (with face-relative positions)</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>Important notes:</p><ul><li>Not required for most styles.</li><li>Will be called often, so don't define it unless you need it.</li><li>The w:on-over actor will be called after this actor.</li><li>Not be called during a drag operation.</li></ul><h3><a id="sect7.9" name="sect7.9">7.9 on-over</a></h3><p>The w:on-over actor is called every time the mouse moves over or away from the face.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>the face relative position or none</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>If the face has the w:all-over value specified as true, this actor will be run continuously as long as the mouse is over the face. If w:all-over is not true, it does not report continuously, only on enter and exit.</p><h3><a id="sect7.10" name="sect7.10">7.10 on-resize</a></h3><p>The w:on-resize actor is called every time the layout is resized.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>new size (pair! value)</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>Normally, you use this actor to modify the size fields of the draw block and any GOBs used within it. If your style is a compound style, the faces inside may also need to be resized.</p><p>Resizing a single face:</p><pre class="example">on-resize: [
+    face/gob/size: arg
+    set-facet face 'size arg
+]</pre><p>Resizing a compound face (of 'panel' layout type):</p><pre class="example">on-resize: [
+    do-actor/style face 'on-resize arg 'hpanel
+    ;style specific code follows
+    ....
+]</pre><h3><a id="sect7.11" name="sect7.11">7.11 on-scroll</a></h3><p>The w:on-scroll actor is called from one face to scroll another face.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>the face object of the scroller</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>true if the attach was successful</p></td></tr></table></div><p>When a scroll-bar is moved it will call this function to tell its target face to scroll. This is how a scroll-bar informs the other face that it's time to update. So, this actor must be defined for styles that are scrollable.</p><p>When a face is scrolled, this actor can be called directly by the w:scroll reactor or by a prior attachment that occurs when a scrollable face is defined before a scrolling style.</p><p>Do not confuse this with w:on-scroll-event which takes an event to perform.</p><p>Scroll a text area face:</p><pre class="example">on-scroll: [ ; arg: scroller
+    gob: sub-gob? face
+    size: gob/size - gob/text/scroll
+    tsize: size-text gob
+    gob/text/scroll/y: min 0 arg/state/value * negate tsize/y - gob/size/y + 5
+    show-later face
+]</pre><h3><a id="sect7.12" name="sect7.12">7.12 on-scroll-event</a></h3><p>The w:on-scroll-event actor is called when a scroll event occurs.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>the event</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>the same event</p></td></tr></table></div><p>Scroll events can be caused by the mouse-wheel or other such devices.</p><p>Do not confuse this actor with w:on-scroll which is used to scroll a face from another face, such as a w:scroller style.</p><p>Here's an example:</p><pre class="example">on-scroll-event: [
+    dy: none
+    switch arg/type [
+        scroll-line [dy: arg/offset/y / -30]
+        scroll-page [dy: negate arg/offset/y]
+    ]
+    if dy [bump-scroll face dy]
+    none
+]</pre><p>Note that w:bump-scroll is a function specific to this style.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect8" name="sect8">8. Actors for Value Control</a></h2><h3><a id="sect8.1" name="sect8.1">8.1 on-get</a></h3><p>The w:on-get actor returns values stored in the face object and is normally called by f:get-face. Normally, the default actor is all you need.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>the name of the variable to fetch (default is value)</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>The value fetched.</p></td></tr></table></div><p>The default definition of w:on-get is:</p><pre class="example">on-get: [ ; arg: the field to get
+    select face/state arg
+]</pre><h3><a id="sect8.2" name="sect8.2">8.2 on-set</a></h3><p>The w:on-set actor is called by f:set-face for setting the state value of a face or any other value in the face.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>A block containing the name and its value.</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>The default name is w:value, which means set the primary value of the face.</p><p>Here's an example of w:on-set used by a clock style to set its time:</p><pre class="example">on-set: [
+    if arg/1 = 'value [
+        if date? time: arg/2 [time: time/time]
+        face/state/value: time
+        face/facets/clock/set-clock time
+        show-later face
+    ]
+]</pre><h3><a id="sect8.3" name="sect8.3">8.3 on-clear</a></h3><p>The w:on-clear actor is called when a face needs to be cleared.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>none</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>This actor is called by the w:clear reactor. It is also called when a layout that contains input fields is cleared with the f:clear-layout function.</p><pre class="example">on-clear: [
+    clear face/facets/text-edit
+    show-later face
+]</pre><h3><a id="sect8.4" name="sect8.4">8.4 on-reset</a></h3><p>The w:on-reset actor is called when the face needs to be reset to a predefined initial value.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>none</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>none</p></td></tr></table></div><p>This actor is mainly used for the w:reset reactor.</p><pre class="example">on-reset: [
+    do-actor face 'on-set 0
+]</pre><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect9" name="sect9">9. Other Actors</a></h2><h3><a id="sect9.1" name="sect9.1">9.1 on-draw</a></h3><p>The w:on-draw actor allows you modify a draw block immediately before it is rendered.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>arg</strong></td><td class="defexplain"><p>the current draw block for the face</p></td></tr><tr><td class="defword"><strong>return</strong></td><td class="defexplain"><p>the modified draw block</p></td></tr></table></div><p>This function may be called often, every time a f:draw-face is needed. You should make this actor as efficient as possible. If it is possible for computations can be performed in other actors, such as w:on-click, that should be done.</p><p>Here is an example of the w:on-draw used by buttons (from the clicker style):</p><pre class="example">on-draw: [
+        set-material face face/state/mode
+        color: get-facet face 'border-color
+        if face/state/mode = 'over [color: color / 2]
+        face/facets/pen-color: color
+        arg ; return draw block
+]</pre><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><p class="end">Document formatter copyright <a href="http://www.robertmuench.de">Robert M. M&uuml;nch</a>. All Rights Reserved.<br />XHTML 1.0 Transitional formatted with Make-Doc-Pro Version:1.3.0 on 20-Jan-2013 at 18:13:47</p></body></html>

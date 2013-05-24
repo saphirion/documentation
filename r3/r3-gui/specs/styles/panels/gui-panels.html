@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<style type="text/css">@media screen { h1,h2,h3,h4,h5,p,a,br,li,td, .underline {font-family:Arial, Helvetica, sans-serif;text-align:justify} body {font-size:11pt;line-height:1.3em} h1 {font-size:18pt} h2 {font-size:15pt} h3 {font-size:13pt} h4 {font-size:12pt} h5 {font-size:11pt} hr {text-align:center;height:1px;border:none;background:black} ol,ul,p,table {margin-left:3em;margin-right:3em} a {text-decoration:none} img {} .defword {width:25%} .defexplain {} .defexplain p {padding:0em;margin:0em} .deftablepara {} .deftable {width:85%;padding-left:1em;border-style:none;vertical-align:top} .deftable td {text-align:left;vertical-align:top} .deftablefaq {border-style:solid;border-width:thin} .stdtable {border:1px solid;background:black} .stdtable th {padding:0.5em;background:#EEEEEE;font-weight:bold;text-align:center} .stdtable td {padding:0.5em;background:white;text-align:left;vertical-align:top} .end {font-size:8pt} .example {margin-left:3em;margin-right:3em;border:1px solid;padding:1em;background-color:#EEEEEE} .header {margin-left:3em;margin-right:3em;border:1px solid;padding:1em;background-color:#FFFFEE} .indented {margin-left: 50px} .litable {text-align:left} .new {border-right:10px solid;padding-right:10px;font-family:Arial} .note {margin:0.5em 3em 0.5em 3em;border:1px solid;padding:0em;background-color:#F0F0A0} .note .title {font-family:sans-serif;font-weight:bold;margin:0.5em} .note .message {margin:0.5em 1.5em 0.5em 1.5em;padding:0em} .note .message p {padding:0em;margin:1em 0em 1em 0em} .reference {} .caption {font-size:10pt;text-align:center;font-style:italic} .todolist {padding:0.5em;font-size:10pt} .todolist p {margin:0em 3em 0em 3em} .todo {margin:1em 3em 1em 3em;padding:0.5em;border:solid 2px black;background:#FFAAAA;font-size:10pt} .todo p {margin:0.2em 1em 0.2em 1em} .inline {margin:0.5em 3em 0.5em 3em;border:solid 1px;padding:0em;background-color:#EEEEEE} .inline .title {font-family:sans-serif;font-weight:bold;margin:0.5em} .inline .elements {font-size:10pt;margin:0em 0em 0.5em 0em;padding:0em 1em 0em 1em} .inline .elements p {display:inline-table;margin:0.25em 0.5em 0.25em 0.5em} .tocindent {margin-left: 2em} .top {font-size:8pt;text-align:right} .underline {text-decoration:underline} } @media print { h1,h2,h3,h4,h5,p,a,br,li, #underline {font-family:Arial;text-align:justify;orphans:5;widows:5} p,li,td {font-size:10pt} ul,ol {page-break-after:avoid;orphans:5;widows:5} }</style><title>R3 GUI Panels and Layouts</title></head><body><a id="top" name="top"></a><h2>R3 GUI Panels and Layouts</h2><pre class="example">Author: Carl Sassenrath, RMA
+Date: 9-Feb-2011/10:31:09+1:00</pre><hr /><h2>Contents</h2><div class="tocindent"><a href="#sect1"><strong>1. Concepts</strong></a><br /><a href="#sect2"><strong>2. Using Panels</strong></a><br /><div class="tocindent"><a href="#sect2.1"><strong>2.1 Panel Functions</strong></a><br /><a href="#sect2.2"><strong>2.2 Panel Object is a Face</strong></a><br /></div><a href="#sect3"><strong>3. Panels for Layout</strong></a><br /><div class="tocindent"><a href="#sect3.1"><strong>3.1 Panel Variations</strong></a><br /><a href="#sect3.2"><strong>3.2 Multiple Columns</strong></a><br /><a href="#sect3.3"><strong>3.3 Vertical layouts</strong></a><br /><a href="#sect3.4"><strong>3.4 Combining Panels</strong></a><br /><a href="#sect3.5"><strong>3.5 Input Form Panel</strong></a><br /></div><a href="#sect4"><strong>4. Panel Spacing</strong></a><br /><div class="tocindent"><a href="#sect4.1"><strong>4.1 Extra Pad Spacing</strong></a><br /></div><a href="#sect5"><strong>5. Panel Sizing</strong></a><br /><div class="tocindent"><a href="#sect5.1"><strong>5.1 Init-size, Min-size, Max-size</strong></a><br /><a href="#sect5.2"><strong>5.2 Size Computation</strong></a><br /><a href="#sect5.3"><strong>5.3 Examples</strong></a><br /></div><a href="#sect6"><strong>6. Visibility of faces</strong></a><br /><a href="#sect7"><strong>7. Linking Related Faces</strong></a><br /><div class="tocindent"><a href="#sect7.1"><strong>7.1 Named Relations</strong></a><br /><a href="#sect7.2"><strong>7.2 Proximity Relations</strong></a><br /></div><a href="#sect8"><strong>8. Transition Effects</strong></a><br /><a href="#sect9"><strong>9. Other Predefined Panels</strong></a><br /><a href="#sect10"><strong>10 Defining Panel Styles</strong></a><br /></div><h2><a id="sect1" name="sect1">1. Concepts</a></h2><p>A <em>panel</em> is a <em>layout</em> of <em>faces</em>.</p><p>Panels are collections of related <em>faces</em> used for specific parts of a user interface. The faces within a panel are created during the layout stage of processing where the GUI language (a dialect) is interpreted and its styles create actual faces.</p><p>The GUI system has been designed to make panels very easy to create, debug, and maintain. One of the main goals was for simple GUI definitions to be able to create a wide range of simple, predictable results, but also to allow more sophisticated and elaborate results to be produced using the same set of basic rules.</p><p>Basically, panels provide a way to:</p><ul><li>Group a number of faces together,</li><li>Arrange faces into a desired layout,</li><li>Display a 2D layer, with background or other effects,</li><li>Update and resize those faces when events occur.</li></ul><p>Every <em>window</em> of the GUI display is a panel, and each contains a number of sub-panels to further divide its area into sections. And, a panel is itself a face, and a GUI is created from one or more layers of panels, each of which holds faces of its own.</p><p>The faces that compose a panel are defined using the GUI language, a special dialect of REBOL. This approach saves time and effort compared to function-based or tag-based languages.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect2" name="sect2">2. Using Panels</a></h2><p>Panels are fundamental to the GUI. When you open a new window like the one defined below, you are creating a panel.</p><p><img src="./graphics/gui-panels-0a.png" alt="./graphics/gui-panels-0a.png"/></p><pre class="example">view [
+    text &quot;Example window.&quot;
+    button &quot;Close&quot; close
+]</pre><p>Here the f:view function internally calls the f:make-panel function that takes the GUI dialect block and builds a panel object as a result. The panel contains two <em>faces</em>: one of the text style and one of the button style.</p><p>Panels are often used to divide other panels with <em>subpanels</em>:</p><p><img src="./graphics/gui-panels-0b.png" alt="./graphics/gui-panels-0b.png"/></p><pre class="example">view [
+    vpanel [
+        text &quot;Show website&quot;
+        button &quot;Show&quot; browse http://www.rebol.com
+    ]
+    vpanel [
+        text &quot;Example window.&quot;
+        button &quot;Close&quot; close
+    ]
+]</pre><p>This window panel contains two subpanels.</p><h3><a id="sect2.1" name="sect2.1">2.1 Panel Functions</a></h3><p>The GUI functions that deal with panels are:</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>view</strong></td><td class="defexplain"><p>Create a panel and display it in a window.</p></td></tr><tr><td class="defword"><strong>set-panel</strong></td><td class="defexplain"><p>Set panel input face values from a block of values.</p></td></tr><tr><td class="defword"><strong>get-panel</strong></td><td class="defexplain"><p>Get panel input face values as a block.</p></td></tr><tr><td class="defword"><strong>clear-panel</strong></td><td class="defexplain"><p>Clear panel input face values.</p></td></tr><tr><td class="defword"><strong>parse-panel</strong></td><td class="defexplain"><p>Parses the panel dialect and returns a block of faces/commands.</p></td></tr><tr><td class="defword"><strong>effect-panel</strong></td><td class="defexplain"><p>Display a panel transition effect.</p></td></tr><tr><td class="defword"><strong>switch-panel</strong></td><td class="defexplain"><p>Switch the contents of a panel, using the effect if specified.</p></td></tr><tr><td class="defword"><strong>get-parent-panel</strong></td><td class="defexplain"><p>Get panel input faces for the contextual parent panel.</p></td></tr><tr><td class="defword"><strong>get-panel-var</strong></td><td class="defexplain"><p>Get the value of a top level panel/names local variable.</p></td></tr></table></div><h3><a id="sect2.2" name="sect2.2">2.2 Panel Object is a Face</a></h3><p>Panels just use the &quot;face&quot; object, with a few extra fields added:</p><div><table class="stdtable" border="0" cellpadding="0" cellspacing="1"><tr><td>intern </td><td> object! </td><td> Layout data, mainly for sizing, updated after every content change.</td></tr><tr><td>auto-size </td><td> logic! </td><td> Compute the panel init-size, min-size and max-size after every content change.</td></tr><tr><td>resize </td><td> logic! </td><td> Use the panel init-size as the min-size and max-size of the panel to suppress panel size changes (works only with auto-size).</td></tr></table></div><p>Additional fields may be appended by special panel styles.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect3" name="sect3">3. Panels for Layout</a></h2><p><em>Panels</em> provide an efficient and elegant mechanism for laying out the elements of a GUI.</p><p>A panel is defined as a collection of faces. When specified within the GUI dialect, the order of the style names determines their positions within the panel area.</p><p>For example, using the code below, you'll see the buttons positioned in that same order vertically:</p><p><img src="./graphics/gui-panels-0.png" alt="./graphics/gui-panels-0.png"/></p><pre class="example">view [
+    vpanel [
+        button &quot;First&quot;
+        button &quot;Second&quot;
+        button &quot;Third&quot;
+    ]
+]</pre><h3><a id="sect3.1" name="sect3.1">3.1 Panel Variations</a></h3><p>The default layout direction depends on the panel style. For example, in a vpanel faces are positioned from top to bottom. However, several variations in layout are possible, and a few predefined styles are available that can be used in various combinations to create a wide variety of layouts.</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>vpanel</strong></td><td class="defexplain"><p>Its contents are arranged vertically by default, all columns except for the last one contain the same number of faces.</p></td></tr><tr><td class="defword"><strong>hpanel</strong></td><td class="defexplain"><p>Its contents are arranged horizontally by default, all rows except for the last one contain the same number of faces.</p></td></tr><tr><td class="defword"><strong>vgroup</strong></td><td class="defexplain"><p>Its contents are arranged vertically by default. Using the RETURN keyword, a user can set every column to have its own length.</p></td></tr><tr><td class="defword"><strong>hgroup</strong></td><td class="defexplain"><p>Its contents are arranged horizontally by default. Using the RETURN keyword, a user can set every row to have its own length.</p></td></tr></table></div><p>The examples below show the main differences between the w:panel and w:group styles.</p><p>Here's a w:vpanel layout. Its default orientation is vertical:</p><p><img src="./graphics/gui-panels-1.png" alt="./graphics/gui-panels-1.png"/></p><pre class="example">view [
+    vpanel [
+        button &quot;First&quot;
+        button &quot;Second&quot;
+    ]
+]</pre><p>Here's a w:hpanel layout. Its default orientation is horizontal:</p><p><img src="./graphics/gui-panels-2.png" alt="./graphics/gui-panels-2.png"/></p><pre class="example">view [
+    hpanel [
+        button &quot;First&quot;
+        button &quot;Second&quot;
+    ]
+]</pre><p>This table summarizes the main differences between these panel styles:</p><div><table class="stdtable" border="0" cellpadding="0" cellspacing="1"><tr><td>Style </td><td>Direction </td><td>Row/column length </td></tr><tr><td>vpanel </td><td>vertical </td><td>same for all columns </td></tr><tr><td>hpanel </td><td>horizontal </td><td>same for all rows </td></tr><tr><td>vgroup </td><td>vertical </td><td>every column can have individual length </td></tr><tr><td>hgroup </td><td>horizontal </td><td>every row can have individual length</td></tr></table></div><h3><a id="sect3.2" name="sect3.2">3.2 Multiple Columns</a></h3><p>You can specify the number of columns for a w:hpanel or w:hgroup styles. This is convenient for many layouts, such as input forms that contain multiple labels and input fields. If you don't specify the number, the layout is expected to have just one row.</p><p>Here's an example two column hpanel:</p><p><img src="./graphics/gui-panels-2-col.png" alt="./graphics/gui-panels-2-col.png"/></p><pre class="example">view [
+    hpanel 2 [
+        button &quot;First&quot;
+        button &quot;Second&quot;
+        button &quot;Third&quot;
+        button &quot;Fourth&quot;
+        button &quot;Fifth&quot;
+        button &quot;Sixth&quot;
+    ]
+]</pre><p>The buttons are laid out in rows first, then columns. The number of rows is determined by dividing the total number of faces by the number of columns.</p><p>For w:hgroup panels you can use the RETURN keyword to specify the number of elements in each row:</p><p><img src="./graphics/gui-panels-2g-col.png" alt="./graphics/gui-panels-2g-col.png"/></p><pre class="example">view [
+    hgroup [
+        button &quot;First&quot;
+        button &quot;Second&quot;
+        return
+        button &quot;Third&quot;
+        button &quot;Fourth&quot;
+        return
+        button &quot;Fifth&quot;
+        button &quot;Sixth&quot;
+    ]
+]</pre><p>Note, though, that for the w:hgroup panels there is no guarantee, that the columns will be maintained, and, above, it is just caused by using the buttons with equal dimensions.</p><p>Continuing on, here is a three column w:hpanel layout:</p><p><img src="./graphics/gui-panels-3-col.png" alt="./graphics/gui-panels-3-col.png"/></p><pre class="example">view [
+    hpanel 3 [
+        button &quot;First&quot;
+        button &quot;Second&quot;
+        button &quot;Third&quot;
+        button &quot;Fourth&quot;
+        button &quot;Fifth&quot;
+        button &quot;Sixth&quot;
+    ]
+]</pre><p>And if we show four columns, the last row will contain only two buttons.</p><p><img src="./graphics/gui-panels-4-col.png" alt="./graphics/gui-panels-4-col.png"/></p><pre class="example">view [
+    hpanel 4 [
+        button &quot;First&quot;
+        button &quot;Second&quot;
+        button &quot;Third&quot;
+        button &quot;Fourth&quot;
+        button &quot;Fifth&quot;
+        button &quot;Sixth&quot;
+    ]
+]</pre><h3><a id="sect3.3" name="sect3.3">3.3 Vertical layouts</a></h3><p>If you use a vertical layout, you specify the number of rows instead. When the number of rows is omitted, or defined as zero, the number of rows is equal to the number of faces.</p><p><img src="./graphics/gui-panels-vert.png" alt="./graphics/gui-panels-vert.png"/></p><pre class="example">view [
+    vpanel [
+        button &quot;First&quot;
+        button &quot;Second&quot;
+        button &quot;Third&quot;
+        button &quot;Fourth&quot;
+        button &quot;Fifth&quot;
+        button &quot;Sixth&quot;
+    ]
+]</pre><p>Similarly as above, for vgroup you can use the RETURN keyword to influence the number of elements in every column individually, causing individual columns to have different lengths eventually.</p><h3><a id="sect3.4" name="sect3.4">3.4 Combining Panels</a></h3><p>To create a wide variety of layouts, you can combine panel styles in various ways.</p><p>For example, here's a hgroup of panels of buttons:</p><p><img src="./graphics/gui-panels-combo-1.png" alt="./graphics/gui-panels-combo-1.png"/></p><pre class="example">view [
+    hgroup [
+        vpanel [
+            button &quot;First&quot;
+            button &quot;Second&quot;
+        ]
+        vpanel [
+            button &quot;Third&quot;
+            button &quot;Fourth&quot;
+        ]
+        vpanel [
+            button &quot;Fifth&quot;
+            button &quot;Sixth&quot;
+        ]
+    ]
+]</pre><p>But, here they are stacked in a different order:</p><p><img src="./graphics/gui-panels-combo-2.png" alt="./graphics/gui-panels-combo-2.png"/></p><pre class="example">view [
+    vgroup [
+        hpanel [
+            button &quot;First&quot;
+            button &quot;Second&quot;
+        ]
+        hpanel [
+            button &quot;Third&quot;
+            button &quot;Fourth&quot;
+        ]
+        hpanel [
+            button &quot;Fifth&quot;
+            button &quot;Sixth&quot;
+        ]
+    ]
+]</pre><p>The example below shows how different numbers of elements can be grouped on separate rows without using panel combo:</p><p><img src="./graphics/gui-panels-group-1.png" alt="./graphics/gui-panels-group-1.png"/></p><pre class="example">view [
+    hgroup [
+        button &quot;First&quot;
+        button &quot;Second&quot;
+        return
+        button &quot;Third&quot;
+        button &quot;Fourth&quot;
+        button &quot;Fifth&quot;
+        return
+        button &quot;Sixth&quot;
+        button &quot;Seventh&quot;
+        button &quot;Eighth&quot;
+        button &quot;Nineth&quot;
+    ] options [pane-align: 'center]
+]</pre><p>, and this is the same layout being resized to be wider:</p><p><img src="./graphics/gui-panels-group-1a.png" alt="./graphics/gui-panels-group-1a.png"/></p><p>Notice also, how the PANE-ALIGN attribute influenced the look of the layout.</p><h3><a id="sect3.5" name="sect3.5">3.5 Input Form Panel</a></h3><p>Of course, the above layouts are just for illustration. A real panel might look more like:</p><p><img src="./graphics/gui-opinion-form.png" alt="./graphics/gui-opinion-form.png"/></p><p>Opinion survey form (alpha skin)</p><p>And, its code is:</p><pre class="example">view [
+    title &quot;Opinion Survey&quot;
+    text &quot;Do you want programs to be easy to build?&quot;
+    hpanel 2 [
+        label &quot;Answer:&quot;
+        hgroup [
+            radio &quot;Agree&quot;
+            radio &quot;Disagree&quot;
+            radio &quot;Not sure&quot;
+        ]
+        pad
+        check &quot;I'm a programmer.&quot;
+        pad
+        check &quot;I am also a REBOL expert.&quot;
+        label &quot;Name:&quot;
+        field
+        label &quot;Comment:&quot;
+        ;area
+    ]
+    hgroup [
+        button &quot;Submit&quot; submit http://www.rebol.net/cgi/submit.r
+        button &quot;Reset&quot;  reset
+        button &quot;Cancel&quot; close
+    ]
+]</pre><p>For more examples, see <em>guide</em>.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect4" name="sect4">4. Panel Spacing</a></h2><p>In addition to the box model used, which defines individual margins, borders, etc. for every face, all panel styles define the spacing attribute for their layout, which specifies the additional space inserted between subsequent columns and rows.</p><p>Here are a few panels with specified options:</p><p><img src="./graphics/gui-panels-combo-3.png" alt="./graphics/gui-panels-combo-3.png"/></p><pre class="example">view [
+    vpanel [
+        button &quot;1&quot;
+        button &quot;2&quot;
+        button &quot;3&quot;
+    ]   
+    vpanel [
+        button &quot;1&quot;
+        button &quot;2&quot;
+        button &quot;3&quot;
+    ] options [margin: [30x30 30x30]]
+    vpanel [
+        button &quot;1&quot;
+        button &quot;2&quot;
+        button &quot;3&quot;
+    ] options [
+        padding: [30x30 30x30]
+    ]
+    vpanel [
+        button &quot;1&quot;
+        button &quot;2&quot;
+        button &quot;3&quot;
+    ] options [
+        spacing: 20x20
+    ]
+]</pre><h3><a id="sect4.1" name="sect4.1">4.1 Extra Pad Spacing</a></h3><p>From time to time you may need additional spacing between faces in a panel. The w:pad style has been defined to help with this.</p><p>The w:pad style can be used with or without optional size information. When used alone, it expands space automatically. Or, you can give it an exact size.</p><p>Here are a few examples:</p><p><img src="./graphics/gui-panels-combo-4.png" alt="./graphics/gui-panels-combo-4.png"/></p><pre class="example">view [
+    vpanel [
+        button &quot;1&quot;
+        button &quot;2&quot;
+        button &quot;3&quot;
+    ]
+    vpanel [
+        button &quot;1&quot;
+        pad
+        button &quot;2&quot;
+        button &quot;3&quot;
+    ]
+    vpanel [
+        button &quot;1&quot;
+        pad 10x20
+        button &quot;2&quot;
+        button &quot;3&quot;
+    ]
+]</pre><p>Note that a pad is an actual face, so it will count as the element of a cell.</p><p><img src="./graphics/gui-panels-combo-5.png" alt="./graphics/gui-panels-combo-5.png"/></p><pre class="example">view [
+    hpanel 2 [
+        button &quot;1&quot;
+        button &quot;2&quot;
+        pad
+        button &quot;3&quot;
+    ]
+]</pre><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect5" name="sect5">5. Panel Sizing</a></h2><p>When creating a panel, it is possible to either define its initial size, or to let the panel auto-size for you.</p><p>When auto-sizing, the initial size of the panel is determined by its elements and by the size available for it (for example, by the size of the screen or window). And, within a panel, the rows and columns that make up its layout may be of different widths and heights.</p><p>In general the rules are:</p><ul><li>The widest element of a column will set the column width.</li><li>The tallest element of a row will set the row height.</li><li>Columns and rows can be smaller or larger than these values, depending on the availability of space for expansion.</li></ul><h3><a id="sect5.1" name="sect5.1">5.1 Init-size, Min-size, Max-size</a></h3><p>More specifically, the sizes of elements are determined by their sizes, as set by their styles or by their face instance. Each style, hence each face, can specify three sizes:</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>init-size</strong></td><td class="defexplain"><p>can be called the natural size of the face, this is the size it &quot;wants to be&quot;</p></td></tr><tr><td class="defword"><strong>min-size</strong></td><td class="defexplain"><p>the smallest size allowed</p></td></tr><tr><td class="defword"><strong>max-size</strong></td><td class="defexplain"><p>the largest size allowed</p></td></tr></table></div><p>These sizes are all pair! values, so they include both the x (width) and y (height) values.</p><p>For example, a text w:field can normally be 300x24, but be allowed to shrink to 100x24 or expand to 500x24. Such a style definition would look like this:</p><pre class="example">my-field: field [
+    facets [
+        init-size: 300x24
+        min-size: 100x24
+        max-size: 500x24
+    ]
+]</pre><h3><a id="sect5.2" name="sect5.2">5.2 Size Computation</a></h3><p>The size of a panel is determined by the combined sizes of its elements (faces within it) or by a size specified for it (from its options).</p><p>Before any hpanel/vpanel sizing can be done, the system must determine for each column and each row:</p><ol><li>the init-size (the largest init-size of the row/column elements)</li><li>the min-size (the largest min-size of the row/column elements)</li><li>the max-size (the largest max-size of the row/column elements)</li></ol><p>Hgroup/vgroup differs in that e.g. for a hgroup the init-size, min-size and max-size of every row are computed, columns aren't maintained in hgroups. (In vgroups, rows aren't maintained.)</p><p>Now the system can update the panel, i.e. compute (for vpanel/hpanel):</p><ol><li>the pane init-size (as the sum of the line and column init-sizes)</li><li>the pane min-size (analogically)</li><li>the pane max-size (analogically)</li><li>the line minification index (lines are ordered by their ability to shrink)</li><li>the line magnification index (lines are ordered by their ability to expand)</li><li>the column minification index</li><li>the column magnification index</li><li>the panel init-size - if the panel has the auto-size? property (e.g. if the panel init-size is unknown, or set to 0x0, or if the auto-size? property is specified as an option), use the pane init-size computed above and add the panel box-model attributes. If the panel does not auto-size, use the init-size specified.</li><li>the panel min-size - if the panel has the resizes? property, use the above pane min-size, and add the panel box-model attributes, otherwise use the init-size to effectively disable resizing</li><li>the panel max-size</li></ol><p>For an updated panel, the actual resizing can be computed as follows:</p><p>Vertical and horizontal resizing are performed independently on each other, thus, it is possible to expand a panel in the horizontal direction, and shrink it in the vertical direction at the same time.</p><p>When resizing a hpanel/vpanel, the goal is to resize its rows and columns so, that all the available space is used if possible, and that the individual rows and columns are resized at the same (or similar) rate if possible.</p><p>To facilitate that, the flexibilities (maximal expansion/shrinking rates) of all rows/columns are computed, and the rows/columns with lowest flexibilities are resized first. Then, the rest of the space available can be taken by the rest of the rows (columns) with greater flexibilities.</p><p>Panels can be resized by the user, such as when a window size is changed, or by the program itself.</p><p>When a panel is resized, the layout is recomputed according to the same rules as above. All of the faces within it will be resized and repositioned as necessary, including all sub-panels.</p><h3><a id="sect5.3" name="sect5.3">5.3 Examples</a></h3><p>This code provides a good comparison for how GUI faces are resized according to their max-size option. The window shows five groups, each that contains three colored boxes. Each box is the same style, but changes its max-size option to a different value.</p><p>Resize the window to see the resizing of each box:</p><pre class="example">stylize [
+    boxa: box [
+        facets: [
+            init-size: 32x32
+            bg-color: none
+        ]
+        options: [
+            init-size: [pair!]
+            box-color: [tuple!]
+        ]
+        draw: [
+            pen 0.0.0
+            line-width 1.2
+            fill-pen box-color
+            box 1x1 (gob-size - 2) 3
+        ]
+        actors: [
+            on-draw: [
+                arg
+            ]
+        ]
+    ]
+    pada: pad [
+        facets: [max-size: 10x10]
+    ]
+]
+
+view [
+    hgroup [
+        boxa red
+        boxa green
+        boxa blue
+    ]
+    hgroup [
+        boxa red   options [max-size: 100x32]
+        boxa green options [max-size: 200x32]
+        boxa blue  options [max-size: 400x32]
+    ]
+    hgroup [
+        boxa red   options [max-size: 100x32]
+        boxa green options [max-size: 2000x32]
+        boxa blue  options [max-size: 4000x32]
+    ]
+    hgroup [
+        boxa red   options [max-size: 100x32]
+        pad
+        boxa green options [max-size: 2000x32]
+        pad
+        boxa blue  options [max-size: 4000x32]
+    ]
+    hgroup [
+        boxa red   options [max-size: 100x32]
+        pada
+        boxa green options [max-size: 2000x32]
+        pada
+        boxa blue  options [max-size: 4000x32]
+    ]
+]</pre><p>Here's how the window is first opened:</p><p><img src="./graphics/gui-panels-sizing-1.png" alt="./graphics/gui-panels-sizing-1.png"/></p><p>And if it's resized to a wider shape, it will look like:</p><p><img src="./graphics/gui-panels-sizing-2.png" alt="./graphics/gui-panels-sizing-2.png"/></p><p>Here are some features to observe:</p><ul><li>The first group of boxes all expand in equal proportion.</li><li>The second group expands in equal proportion, until the max-size of the green box is reached. Afterwards, the green box stops expanding leaving the space for the other boxes. Also note that if you expand the window large enough, each of the boxes will stop expanding at their max-size values. (You will not see that effect if the window is too small.)</li><li>The third group shows a more extreme example, where the green and blue boxes are expanded by a lot more than the red box. The red box has only expanded by a small amount (if at all).</li><li>The fourth group adds some w:pad faces between the boxes. Notice that by default, the pads add substantial space.</li><li>The fifth group uses the w:pada style which limits the max-size. Notice that the pad spaces are much smaller.</li></ul><p>An analogical example can be written using just one hgroup and the RETURN keyword:</p><pre class="example">stylize [
+    boxa: box [
+        facets: [
+            init-size: 32x32
+            bg-color: none
+        ]
+        options: [
+            init-size: [pair!]
+            box-color: [tuple!]
+        ]
+        draw: [
+            pen 0.0.0
+            line-width 1.2
+            fill-pen box-color
+            box 1x1 (gob-size - 2) 3
+        ]
+        actors: [
+            on-draw: [
+                arg
+            ]
+        ]
+    ]
+    pada: pad [
+        facets: [max-size: 10x10]
+    ]
+]
+
+view [
+    hgroup [
+        boxa red
+        boxa green
+        boxa blue
+        return
+        boxa red   options [max-size: 100x32]
+        boxa green options [max-size: 200x32]
+        boxa blue  options [max-size: 400x32]
+        return
+        boxa red   options [max-size: 100x32]
+        boxa green options [max-size: 2000x32]
+        boxa blue  options [max-size: 4000x32]
+        return
+        boxa red   options [max-size: 100x32]
+        pad
+        boxa green options [max-size: 2000x32]
+        pad
+        boxa blue  options [max-size: 4000x32]
+        return
+        boxa red   options [max-size: 100x32]
+        pada
+        boxa green options [max-size: 2000x32]
+        pada
+        boxa blue  options [max-size: 4000x32]
+    ]
+]</pre><p><img src="./graphics/gui-panels-sizing-3.png" alt="./graphics/gui-panels-sizing-3.png"/></p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect6" name="sect6">6. Visibility of faces</a></h2><p>The SHOW-FACE function is defined to set the visibility/resizeability of a face in a panel to one of the following states:</p><ol><li>VISIBLE - the face is visible and resizes/repositions with the panel</li><li>HIDDEN - the face is invisible, but it resizes with the panel, occupying the same space as if it were visible</li><li>IGNORED - the face is invisible, and it does not take any space</li><li>FIXED - the face is visible, but it does not resize/reposition with the panel</li></ol><p><img src="./graphics/gui-panels-visibility.png" alt="./graphics/gui-panels-visibility.png"/></p><p>Example:</p><pre class="example">update-btn: func [
+    btn [object!]
+    id [integer!]
+][
+    id: pick [visible hidden ignored fixed] id  
+    if id = 'fixed [
+        btn/gob/offset: random 100x100
+    ]
+    show-face btn id
+]
+
+view [
+    title &quot;SHOW? modes test example&quot;
+    hpanel 3 [
+        b1: button &quot;one&quot;
+        b2: button &quot;two&quot;
+        b3: button &quot;three&quot;
+        b4: button &quot;four&quot;
+        b5: button &quot;five&quot;
+        b6: button &quot;six&quot;
+    ]
+    hgroup [
+        drop-down [&quot;visible&quot; &quot;hidden&quot; &quot;ignored&quot; &quot;fixed&quot;]
+            on-set [do [update-btn b1 actor-arg]]
+        drop-down [&quot;visible&quot; &quot;hidden&quot; &quot;ignored&quot; &quot;fixed&quot;]
+            on-set [do [update-btn b2 actor-arg]]
+        drop-down [&quot;visible&quot; &quot;hidden&quot; &quot;ignored&quot; &quot;fixed&quot;]
+            on-set [do [update-btn b3 actor-arg]]
+        return
+        drop-down [&quot;visible&quot; &quot;hidden&quot; &quot;ignored&quot; &quot;fixed&quot;]
+            on-set [do [update-btn b4 actor-arg]]
+        drop-down [&quot;visible&quot; &quot;hidden&quot; &quot;ignored&quot; &quot;fixed&quot;]
+            on-set [do [update-btn b5 actor-arg]]
+        drop-down [&quot;visible&quot; &quot;hidden&quot; &quot;ignored&quot; &quot;fixed&quot;]
+            on-set [do [update-btn b6 actor-arg]]
+    ]
+]</pre><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect7" name="sect7">7. Linking Related Faces</a></h2><p>Within a GUI there are times when you need to link or attach one face to another. Change to one of the faces affects the other. For example, a scroll bar may cause a text panel to scroll its contents.</p><p>There are two methods of relating faces: <em>named relations</em> and <em>proximity relations</em>. They are explained below.</p><h3><a id="sect7.1" name="sect7.1">7.1 Named Relations</a></h3><p>You can give a name to a face and that name can be used from other faces to perform specific actions.</p><p>For example:</p><pre class="example">prog: progress
+slider attach 'prog</pre><p>Here w:attach is a <em>reactor</em> that &quot;connects&quot; the slider value to the progress bar. The w:prog face name is used to do that, and be sure to note that the name must be a literal word where it is referenced.</p><p>Warning: It should be noted that all names are scoped to their primary panel, so you can refer to a name from other panels within the primary panel.</p><p>For example, this still works, even though the w:prog name is used from a different panel:</p><pre class="example">prog: progress
+hpanel [
+    text &quot;Move this slider:&quot;
+    slider attach 'prog
+]</pre><p>Note: the w:names facet of a parent controls the scope of names.</p><h3><a id="sect7.2" name="sect7.2">7.2 Proximity Relations</a></h3><p>Some faces can automatically attach themselves to other faces that are nearby.</p><p>For example, a w:scroller will attach itself automatically to any prior face that includes an w:on-scroll actor. This feature makes it easy to attach scroll bars to text areas and panels without requiring names.</p><p>Here is an example:</p><pre class="example">hgroup [
+    text-area &quot;This is an example&quot;
+    scroller
+]</pre><p>This works the same way as if you wrote:</p><pre class="example">hgroup [
+    ta: text-area &quot;This is an example&quot;
+    scroller attach 'ta
+]</pre><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect8" name="sect8">8. Transition Effects</a></h2><p>Animated transition effects can be used to switch from one panel to another. The effects are specified as an argument to the f:switch-panel function.</p><p>Currently, these effects are defined:</p><div class="deftablepara"><table class="deftable"><tr><td class="defword"><strong>fly-right</strong></td><td class="defexplain"><p>fly on from left to right</p></td></tr><tr><td class="defword"><strong>fly-left</strong></td><td class="defexplain"><p>fly on from right to left</p></td></tr><tr><td class="defword"><strong>fly-up</strong></td><td class="defexplain"><p>fly on from bottom to top</p></td></tr><tr><td class="defword"><strong>fly-down</strong></td><td class="defexplain"><p>fly on from top to bottom</p></td></tr></table></div><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect9" name="sect9">9. Other Predefined Panels</a></h2><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect10" name="sect10">10. Defining Panel Styles</a></h2><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><p class="end">Document formatter copyright <a href="http://www.robertmuench.de">Robert M. M&uuml;nch</a>. All Rights Reserved.<br />XHTML 1.0 Transitional formatted with Make-Doc-Pro Version:1.3.0 on 4-Mar-2011 at 20:24:15</p></body></html>

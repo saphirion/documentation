@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<style type="text/css">@media screen { h1,h2,h3,h4,h5,p,a,br,li,td, .underline {font-family:Arial, Helvetica, sans-serif;text-align:justify} body {font-size:11pt;line-height:1.3em} h1 {font-size:18pt} h2 {font-size:15pt} h3 {font-size:13pt} h4 {font-size:12pt} h5 {font-size:11pt} hr {text-align:center;height:1px;border:none;background:black} ol,ul,p,table {margin-left:3em;margin-right:3em} a {text-decoration:none} a:hover {text-decoration:underline} img {} .defword {width:25%} .defexplain {} .defexplain p {padding:0em;margin:0em} .deftablepara {} .deftable {width:85%;padding-left:1em;border-style:none;vertical-align:top} .deftable td {text-align:left;vertical-align:top} .deftablefaq {border-style:solid;border-width:thin} .stdtable {border:1px solid;background:black} .stdtable th {padding:0.5em;background:#EEEEEE;font-family:Arial, Helvetica, sans-serif;font-weight:bold;text-align:center} .stdtable td {padding:0.5em;background:white;text-align:left;vertical-align:top} .end {font-size:8pt} .example {margin-left:3em;margin-right:3em;border:1px solid;padding:1em;background-color:#EEEEEE} .header {margin-left:3em;margin-right:3em;border:1px solid;padding:1em;background-color:#FFFFEE} .indented {margin-left: 50px} .litable {text-align:left} .new {border-right:10px solid;padding-right:10px;font-family:Arial} .note {margin:0.5em 3em 0.5em 3em;border:1px solid;padding:0em;background-color:#F0F0A0} .note .title {font-family:sans-serif;font-weight:bold;margin:0.5em} .note .message {margin:0.5em 1.5em 0.5em 1.5em;padding:0em} .note .message p {padding:0em;margin:1em 0em 1em 0em} .reference {} .caption {font-size:10pt;text-align:center;font-style:italic} .todolist {padding:0.5em;font-size:10pt} .todolist p {margin:0em 3em 0em 3em} .todo {margin:1em 3em 1em 3em;padding:0.5em;border:solid 2px black;background:#FFAAAA;font-size:8pt} .todo p {margin:0.2em 1em 0.2em 1em} .inline {margin:0.5em 3em 0.5em 3em;border:solid 1px;padding:0em;background-color:#EEEEEE} .inline .title {font-family:sans-serif;font-weight:bold;margin:0.5em} .inline .elements {font-size:10pt;margin:0em 0em 0.5em 0em;padding:0em 1em 0em 1em} .inline .elements p {display:inline-table;margin:0.25em 0.5em 0.25em 0.5em} .tocindent {margin-left: 2em} .top {font-size:8pt;text-align:right} .underline {text-decoration:underline} } @media print { h1,h2,h3,h4,h5,p,a,br,li, #underline {font-family:Arial;text-align:justify;orphans:5;widows:5} p,li,td {font-size:10pt} ul,ol {page-break-after:avoid;orphans:5;widows:5} }</style><title>R3 GUI Actor overriding techniques</title></head><body onload="window.location.hash = window.location.hash"><a id="top" name="top"></a><h2>R3 GUI Actor overriding techniques</h2><pre class="example">Author: Richard Smolak
+Date: 20-Jan-2013</pre><hr /><h2>Contents</h2><div class="tocindent"><a href="#sect1"><strong>1. Introduction</strong></a><br /><a href="#sect2"><strong>2. Overriding techniques</strong></a><br /><div class="tocindent"><a href="#sect2.1"><strong>2.1 Overriding actor functionality using the STYLIZE function</strong></a><br /><a href="#sect2.2"><strong>2.2 Inline overriding using the layout dialect</strong></a><br /></div></div><h2><a id="sect1" name="sect1">1. Introduction</a></h2><p>During the R3 GUI application developement there are situations where you may look for a way how to override the default functionality of an actor in a specific style.</p><p>There are two possible techiques how to do it depending on your preferences.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect2" name="sect2">2. Overriding techniques</a></h2><p>We'll use a simple example to demonstrate both overriding techniques. Let's have the following layout:</p><pre class="example">view [
+    field
+    text-list [
+        &quot;Robert&quot;
+        &quot;Bolek&quot;
+        &quot;Richard&quot;
+        &quot;Ladislav&quot;
+    ]
+]</pre><p>The code above shows a simple field and a list of names in a window. We want to use a matching filter on the names in the list every time the user types some character in the field.</p><h3><a id="sect2.1" name="sect2.1">2.1 Overriding actor functionality using the STYLIZE function</a></h3><p>This techinque is useful in case you want to separate the newly added actor code from the layout dialect or if you plan to derive new styles based on the additional code.</p><p>Here is a possible solution:</p><pre class="example">stylize [
+    filter-field: field [
+        actors: [
+            on-key: [
+                ;execute the 'original' actor of FIELD style
+                do-actor/style face 'on-key arg 'field
+
+                ;apply the matching filter on my-list
+                val: get-face face
+                set-face/field my-list make map! either empty? val [
+                    [1 [true]]
+                ][
+                    compose/deep [1 [find/match first value (val)]]
+                ] 'filter
+            ]
+        ]
+    ]
+]
+
+view [
+    filter-field
+    my-list: text-list [
+        &quot;Robert&quot;
+        &quot;Bolek&quot;
+        &quot;Richard&quot;
+        &quot;Ladislav&quot;
+    ]
+]</pre><p>The example above works well but there is one issue. The w:my-list name is hardcoded into the definition of the new style ON-KEY actor which is not good, since it can work only in case the MY-LIST name is defined and refers to the list related to the filter field.</p><p>We should refine the example to be reusable. For that purpose we can use the w:attach dialect keyword to achieve a more general and system-friendly functionality:</p><pre class="example">stylize [
+    filter-field: field [
+        actors: [
+            on-init: [
+                ;execute the 'original' actor of FIELD style
+                do-actor/style face 'on-init arg 'field
+            ]
+            on-key: [
+                ;execute the 'original' actor of FIELD style
+                do-actor/style face 'on-key arg 'field
+
+                ;apply the matching filter on the attached target face(s)
+                foreach target select face 'targets [
+                    if target/style = 'text-list [
+                        val: get-face face
+                        set-face/field target make map! either empty? val [
+                            [1 [true]]
+                        ][
+                            compose/deep [1 [find/match first value (val)]]
+                        ] 'filter
+                    ]
+                ]
+            ]
+        ]
+    ]
+]
+
+view [
+    filter-field attach 'my-list
+    my-list: text-list [
+        &quot;Robert&quot;
+        &quot;Bolek&quot;
+        &quot;Richard&quot;
+        &quot;Ladislav&quot;
+    ]
+]</pre><p>The above example works with any text-list face which is attached to a filter-field. Also, the filter-field can be used as a base for new styles. Notice the code used in f:stylize is also longer and more complex, because in fact we derived a new child style from the FIELD parent style.</p><h3><a id="sect2.2" name="sect2.2">2.2 Inline overriding using the layout dialect</a></h3><p>Sometimes you don't want to create a new derived style. This can be handy in the following conditions:</p><ul><li>you intend to use the changed behaviour just once, and</li><li>don't want to use the changed actor behaviour as a base for new styles</li></ul><p>Here is a possible solution:</p><pre class="example">match-filter: func [
+    list [object!]
+    value [string!]
+][
+    ;apply the matching filter on my-list
+    set-face/field list make map! either empty? value [
+        [1 [true]]
+    ][
+        compose/deep [1 [find/match first value (value)]]
+    ] 'filter
+]
+
+view [
+    field on-key [
+        ;execute the 'original' actor of the field
+        do-actor/style face 'on-key arg 'field
+        ;call the filtering function
+        match-filter my-list get-face face
+    ]
+    my-list: text-list [
+        &quot;Robert&quot;
+        &quot;Bolek&quot;
+        &quot;Richard&quot;
+        &quot;Ladislav&quot;
+    ]
+]</pre><p>In the above code the ON-KEY word in the layout dialect means you want to override the on-key actor of the FIELD style, i.e., instead of the original actor, the given code will be evaluated.</p><p>You can override any other existing actor using the same approach. The actor name is then followed by a block which is used instead of the original ON-KEY actor block defined in the FIELD style.</p><p>In this case we don't mind whether the inline block contains any application specific code.</p><p>Same as with the original style actor, you are free to put any code into the inline actor block.</p><p>For example, you can call the original actor before or after your application-dependent code. Or even don't call the original style actor at all or chain multiple actor calls and so on. It all depends on your needs.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><p class="end">Document formatter copyright <a href="http://www.robertmuench.de">Robert M. M&uuml;nch</a>. All Rights Reserved.<br />XHTML 1.0 Transitional formatted with Make-Doc-Pro Version:1.3.0 on 20-Jan-2013 at 18:13:50</p></body></html>

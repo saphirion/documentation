@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<style type="text/css">@media screen { h1,h2,h3,h4,h5,p,a,br,li,td, .underline {font-family:Arial, Helvetica, sans-serif;text-align:justify} body {font-size:11pt;line-height:1.3em} h1 {font-size:18pt} h2 {font-size:15pt} h3 {font-size:13pt} h4 {font-size:12pt} h5 {font-size:11pt} hr {text-align:center;height:1px;border:none;background:black} ol,ul,p,table {margin-left:3em;margin-right:3em} a {text-decoration:none} a:hover {text-decoration:underline} img {} .defword {width:25%} .defexplain {} .defexplain p {padding:0em;margin:0em} .deftablepara {} .deftable {width:85%;padding-left:1em;border-style:none;vertical-align:top} .deftable td {text-align:left;vertical-align:top} .deftablefaq {border-style:solid;border-width:thin} .stdtable {border:1px solid;background:black} .stdtable th {padding:0.5em;background:#EEEEEE;font-family:Arial, Helvetica, sans-serif;font-weight:bold;text-align:center} .stdtable td {padding:0.5em;background:white;text-align:left;vertical-align:top} .end {font-size:8pt} .example {margin-left:3em;margin-right:3em;border:1px solid;padding:1em;background-color:#EEEEEE} .header {margin-left:3em;margin-right:3em;border:1px solid;padding:1em;background-color:#FFFFEE} .indented {margin-left: 50px} .litable {text-align:left} .new {border-right:10px solid;padding-right:10px;font-family:Arial} .note {margin:0.5em 3em 0.5em 3em;border:1px solid;padding:0em;background-color:#F0F0A0} .note .title {font-family:sans-serif;font-weight:bold;margin:0.5em} .note .message {margin:0.5em 1.5em 0.5em 1.5em;padding:0em} .note .message p {padding:0em;margin:1em 0em 1em 0em} .reference {} .caption {font-size:10pt;text-align:center;font-style:italic} .todolist {padding:0.5em;font-size:10pt} .todolist p {margin:0em 3em 0em 3em} .todo {margin:1em 3em 1em 3em;padding:0.5em;border:solid 2px black;background:#FFAAAA;font-size:8pt} .todo p {margin:0.2em 1em 0.2em 1em} .inline {margin:0.5em 3em 0.5em 3em;border:solid 1px;padding:0em;background-color:#EEEEEE} .inline .title {font-family:sans-serif;font-weight:bold;margin:0.5em} .inline .elements {font-size:10pt;margin:0em 0em 0.5em 0em;padding:0em 1em 0em 1em} .inline .elements p {display:inline-table;margin:0.25em 0.5em 0.25em 0.5em} .tocindent {margin-left: 2em} .top {font-size:8pt;text-align:right} .underline {text-decoration:underline} } @media print { h1,h2,h3,h4,h5,p,a,br,li, #underline {font-family:Arial;text-align:justify;orphans:5;widows:5} p,li,td {font-size:10pt} ul,ol {page-break-after:avoid;orphans:5;widows:5} }</style><title>R3 GUI Styles</title></head><body onload="window.location.hash = window.location.hash"><a id="top" name="top"></a><h2>R3 GUI Styles</h2><pre class="header"><strong>Author: Carl Sassenrath, Saphirion AG
+Date: 13-Jan-2013/15:50:55+1:00</strong></pre><hr /><h2>Contents</h2><div class="tocindent"><a href="#sect1"><strong>1. Concepts</strong></a><br /><a href="#sect2"><strong>2. Using Styles</strong></a><br /><div class="tocindent"><a href="#sect2.1"><strong>2.1 With a Layout</strong></a><br /><a href="#sect2.2"><strong>2.2 With Make-Face</strong></a><br /></div><a href="#sect3"><strong>3. Predefined Styles</strong></a><br /><a href="#sect4"><strong>4. Defining Styles</strong></a><br /><div class="tocindent"><a href="#sect4.1"><strong>4.1 Style Functions</strong></a><br /><a href="#sect4.2"><strong>4.2 Definition Format</strong></a><br /><a href="#sect4.3"><strong>4.3 Style Object</strong></a><br /><a href="#sect4.4"><strong>4.4 Standard Facet Names</strong></a><br /></div><a href="#sect5"><strong>5. Example Definitions</strong></a><br /><div class="tocindent"><a href="#sect5.1"><strong>5.1 Simple Variation</strong></a><br /><a href="#sect5.2"><strong>5.2 New Style</strong></a><br /><a href="#sect5.3"><strong>5.3 Facet Attributes</strong></a><br /><a href="#sect5.4"><strong>5.4 Options</strong></a><br /><a href="#sect5.5"><strong>5.5 Attributes and Actors</strong></a><br /></div><a href="#sect6"><strong>6. View All Styles</strong></a><br /><a href="#sect7"><strong>7. Advanced Examples</strong></a><br /><div class="tocindent"><a href="#sect7.1"><strong>7.1 Progress Bar</strong></a><br /><a href="#sect7.2"><strong>7.2 Slider bar (numeric value input)</strong></a><br /></div></div><h2><a id="sect1" name="sect1">1. Concepts</a></h2><p><em>Styles</em> define GUI elements.</p><p>A GUI is built from a collection of styles, such as w:button, w:field, w:text, and w:image. In essence a style defines a <em>class</em> of user interface object, specifying the attributes, variables, and functions that are used to create and operate that object. An <em>instance</em> of a style is a face, one or more of which are displayed in a layout.</p><p>Every style has a <em>name</em> that refers to the style during the construction of a GUI, within documentation, or later for debugging purposes. For example, w:button is the name for a style that looks and acts like a push-button.</p><p>Styles can be collected into a <em>style-sheet</em> that provides all of the definitions for the desired look and feel of a GUI. Style-sheets can be global across an entire application, or local to a specific section of the application. The GUI system supplies a default style-sheet that includes a standard set of useful styles.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect2" name="sect2">2. Using Styles</a></h2><p>GUI styles are used in two main ways:</p><ul><li>To create face objects to be displayed in the GUI.</li></ul><div class="indented"><p>Styles create faces from a layout block (with the GUI dialect) provided to the w:view function, or by calling the w:make-face function directly.</p></div><ul><li>To create <em>new</em> styles from existing styles.</li></ul><div class="indented"><p>The new styles can be simple graphical changes or deeper modifications to the behavior of the style. For example, a w:cancel-button style might be defined from a plain w:button, but with a different color, shape, or default action.</p></div><h3><a id="sect2.1" name="sect2.1">2.1 With a Layout</a></h3><p>Here's an example of styles used within a layout block.</p><pre class="example">view [
+    text &quot;Enter your name:&quot;
+    field
+    button &quot;Submit&quot;
+]</pre><p>The words w:text, w:field, and w:button are the names of styles. They are used here to create faces that will be shown in the GUI when the window is created.</p><h3><a id="sect2.2" name="sect2.2">2.2 With Make-Face</a></h3><p>You can also create a face from a style by calling the f:make-face function directly and providing the style's name and specification block:</p><pre class="example">btn-face: make-face 'button [text: &quot;Submit&quot;]</pre><p>For more examples, see the R3 GUI Faces section.</p><p>With regard to the creation of new styles from existing styles, that is the subject covered in detail below.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect3" name="sect3">3. Predefined Styles</a></h2><p>The system defines a standard set of styles that implement the basic set of graphical elements (the widgets) of a GUI.</p><p>!add full list of styles, this is just a start</p><div><table class="stdtable" border="0" cellpadding="0" cellspacing="1"><tr><td>Style </td><td>Description </td></tr><tr><td>area </td><td>text input area </td></tr><tr><td>button </td><td>expandable button </td></tr><tr><td>drawing </td><td>scalar vector graphic </td></tr><tr><td>field </td><td>text input field </td></tr><tr><td>image </td><td>bitmap image </td></tr><tr><td>h1 </td><td>heading of level 1 </td></tr><tr><td>h2 </td><td>heading of level 2 </td></tr><tr><td>scroller </td><td>scrollbar </td></tr><tr><td>slider </td><td>sliding controller </td></tr><tr><td>text </td><td>section of text </td></tr><tr><td>toggle </td><td>toggle button</td></tr></table></div><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect4" name="sect4">4. Defining Styles</a></h2><p>Styles are normally defined form existing styles. This approach saves time because you only need to define the additional attributes required by the new style.</p><p>When it comes to defining new styles, there are three common patterns, depending on how close existing styles are to what you need:</p><ul><li>Minor variations of another style.</li></ul><div class="indented"><p>Often for commonly reused element of your GUI. These make simple changes to the color, size, or other basic attributes.</p></div><ul><li>Derived from another style.</li></ul><div class="indented"><p>Starts with a basic foundation from another style, but makes substantial additions to its attributes, rendering, or actor functions.</p></div><ul><li>Entirely new style.</li></ul><div class="indented"><p>When no other styles have what you need, you must build one from scratch. This will require greater knowledge of the system.</p></div><h3><a id="sect4.1" name="sect4.1">4.1 Style Functions</a></h3><p>New styles are created by providing a definition block to the f:stylize or f:make-style functions:</p><div><table class="stdtable" border="0" cellpadding="0" cellspacing="1"><tr><td>Function </td><td>Description </td></tr><tr><td>stylize </td><td>Define new styles from a block of names and definitions. The specification of the style is provided in a block format, similar to that used by objects. </td></tr><tr><td>make-style </td><td>Define a new style of a given name. A parent style can be specified. The specification of the style is provided in a block format, similar to that used by objects.</td></tr></table></div><p>Note that various other functions related to styles can be found on the R3 GUI Faces page.</p><h3><a id="sect4.2" name="sect4.2">4.2 Definition Format</a></h3><p>In order to make style definitions easier to create and maintain, the f:stylize function accepts a special declaration format of the general syntax:</p><pre class="example">new-style: parent-style [specifications]</pre><p>The specifications block consists of field names followed followed by their settings, attributes, or functions. The field names are those used by the style object, described in the next section.</p><p>Here's an example of the actual style definition for w:button:</p><pre class="example">button: clicker [</pre><pre class="example">about: &quot;Single action button with text.&quot;</pre><pre class="example">tags: [action tab]</pre><pre class="example">facets: [
+    init-size: 130x24
+    text: &quot;Button&quot;
+    text-style: 'button
+    max-size: 260x24
+    min-size: 24x24
+    text-size-pad: 20x0
+]</pre><pre class="example">options: [
+    text: [string! block!]
+    bg-color: [tuple!]
+    init-size: [pair!]
+    wide: [percent!]
+    face-width: [integer!]
+]</pre><pre class="example">    actors: [
+        on-set: [
+            if arg/1 = 'value [
+                face/facets/text: form any [arg/2 &quot;&quot;]
+                show-later face
+            ]
+        ]
+        on-get: [
+            if arg = 'value [
+                face/facets/text
+            ]
+        ]
+        on-draw: [
+            t: get-facet face 'text
+            ; limit-text-size modifies, so we need to copy
+            ; size is made 20px smaller to incorporate &quot;...&quot; (see text-size-pad)
+            l: limit-text-size copy t face/gob/size - face/facets/text-size-pad face-font? face
+            set-facet face 'text-body either equal? length? t length? l [t][join l &quot;...&quot;]
+            do-style/style face 'on-draw arg 'clicker
+        ]
+    ]
+]</pre><p>This simple style is based on the w:clicker style which defines the main actor functions, as reused for buttons. It adds a new w:about string, a few new w:facets, some w:options and few additional w:actors.</p><p>Many examples will be shown below.</p><h3><a id="sect4.3" name="sect4.3">4.3 Style Object</a></h3><p>A style object includes at least these fields:</p><div><table class="stdtable" border="0" cellpadding="0" cellspacing="1"><tr><td>Field </td><td>Datatype </td><td>Description </td></tr><tr><td>name </td><td>word! </td><td>Identifies a style for construction or debugging purposes. The system finds styles by their unique names. Example names: button and text. </td></tr><tr><td>about </td><td>string! </td><td>A short summary of the style for display by help and documentation functions. </td></tr><tr><td>parent </td><td>word! </td><td>The name of the parent style. For example, the parent of button is a clicker. </td></tr><tr><td>facets </td><td>object! </td><td>Holds named attributes that are referenced within other parts of the style. For example the init-size or bg-color of the style. </td></tr><tr><td>options </td><td>object! </td><td>Optional attributes that are used inline within the GUI definition as shortcuts. For example, a pair value may specify the size of an object. </td></tr><tr><td>actors </td><td>map! </td><td>Functions that are called by the GUI system at specific times for specific purposes. For example, on-click and on-resize. </td></tr><tr><td>draw </td><td>block! </td><td>A block of draw commands and their arguments that are used to render the style into a displayed image. </td></tr><tr><td>state </td><td>block! </td><td>Holds the prototype definition for the face instance variables used by a style. </td></tr><tr><td>content </td><td>block! </td><td>The layout dialect for compound styles.</td></tr></table></div><h3><a id="sect4.4" name="sect4.4">4.4 Standard Facet Names</a></h3><p>Although you can add any facet name you want, many functions of the GUI depend on standard names. For example, the w:bg-color is used for creating the (gradient) backgrounds of most graphical elements.</p><p>Some of the common names are:</p><div><table class="stdtable" border="0" cellpadding="0" cellspacing="1"><tr><td>Name </td><td>Description </td></tr><tr><td>init-size </td><td>define </td></tr><tr><td>min-size </td><td>define </td></tr><tr><td>max-size </td><td>define </td></tr><tr><td>bg-color </td><td>define </td></tr><tr><td>pen-color </td><td>define </td></tr><tr><td>area-fill </td><td>define </td></tr><tr><td>edge-color </td><td>define</td></tr></table></div><p>add complete list!</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect5" name="sect5">5. Example Definitions</a></h2><p>Here are some examples of the most common style creation methods.</p><h3><a id="sect5.1" name="sect5.1">5.1 Simple Variation</a></h3><p>Here is a very simple variation on a style. It's called w:red-box, and it is based on the w:box style. It makes only one change, to define a new facet for the w:bg-color. The rest of the style is inherited from the w:box style which is a base-style of the GUI system.</p><pre class="example">stylize [
+   red-box: box [
+       facets: [bg-color: maroon]
+   ]
+]
+view [red-box]</pre><p>It should be noted that to make a new style from an existing style, you must know the names the facets and how they are being used. In the code above, we know that w:bg-color controls the background color of the box. When you are not sure of what facets are used, you can review the definition of the parent style.</p><p>Here's another example of f:stylize that creates a new button style of a different color and default text label:</p><pre class="example">stylize [
+    stop-button: button [
+        about: &quot;Implements a red stop button&quot;
+        facets: [
+            bg-color: 200.0.0
+            text: &quot;Stop&quot;
+        ]
+    ]
+]
+view [stop-button]</pre><h3><a id="sect5.2" name="sect5.2">5.2 New Style</a></h3><p>Here's an example of a completely new style called w:circle that draws a circle of a fixed size and color:</p><pre class="example">stylize [
+    circle: [
+        about: &quot;A circle style&quot;
+        facets: [
+            init-size: 100x100
+        ]
+        draw: [
+            pen black
+            line-width 2.7
+            fill-pen maroon
+            circle 50x50 40
+        ]
+    ]
+]
+view [circle]</pre><p>The facets block provides the initial size for the face and the draw block provides the drawing instructions.</p><p>Of course, this is just a static circle style with no variations, so let's add a few.</p><h3><a id="sect5.3" name="sect5.3">5.3 Facet Attributes</a></h3><p>Taking the above circle style, we want to <em>parameterize</em> its size and color. This allows its attributes to be specified later, when it is used within a GUI.</p><p>Running this code and resizing the window, we see:</p><pre class="example">stylize [
+    circle: [
+        about: &quot;A resizable circle style&quot;
+        facets: [
+            init-size: 100x100
+            max-size: 1000x1000
+            fill-color: maroon
+            edge-color: black
+        ]
+        draw: [
+            pen edge-color
+            line-width 2.7
+            fill-pen fill-color
+            circle viewport-box/center
+                ((min viewport-box/bottom-right/y viewport-box/bottom-right/x) - 3 / 2)
+        ]
+    ]
+]
+view [circle]</pre><p>Several fields have been added to the facets, and you can see how they are used in the draw block.</p><p>Notice the w:max-size field; it allows the face to resize automatically. The w:draw block includes a bit of math to help compute the new values. Note that in the w:draw block, you can obtain the inner size of the face using w:viewport-box/bottom-right, which is a standard facet for all styles and thus not displayed in the facets block above.</p><p>When displayed, if a size is not provided, it will use its default size. However, it can be resized. If you enter this example, drag the window corner to see the circle resize automatically.</p><h3><a id="sect5.4" name="sect5.4">5.4 Options</a></h3><p>An option is an attribute that can be specified directly within the GUI layout code.</p><p>For example, let's allow the circle color to be provided as an option. In addition, let's expand the code to use that color to make a gradient within the circle.</p><pre class="example">stylize [
+    circle: [
+        about: &quot;A colorable resizable circle style&quot;
+        facets: [
+            init-size: 100x100
+            max-size: 1000x1000
+            fill-color: maroon
+            edge-color: black
+        ]
+        options: [
+            fill-color: [tuple!]
+        ]
+        draw: [
+            pen edge-color
+            line-width 2.7
+            fill-pen fill-color
+            circle viewport-box/center
+                ((min viewport-box/bottom-right/y viewport-box/bottom-right/x) - 3 / 2)
+        ]
+    ]
+]
+view [
+    circle red
+    circle green
+    circle blue
+]</pre><p>Resize the window, and you will see all three automatically resize.</p><h3><a id="sect5.5" name="sect5.5">5.5 Attributes and Actors</a></h3><p>You will notice that the above example recomputes a few values in the draw block every time the object is redrawn. Normally, this is not a problem, but if those computations were more complex, they may add a lot of extra time to the redraw, slowing down the GUI.</p><p>Instead, you can move some of those computed values out of the draw block, and make them attributes of the face. Then, you add some code to compute the values only when necessary.</p><p>Here's an example:</p><pre class="example">stylize [
+    circle: [
+        about: &quot;Draws a resizable circle.&quot;
+        facets: [
+            init-size: 100x100
+            max-size: 1000x1000
+            fill-color: maroon
+            edge-color: black
+            area-fill: none
+            radius: 48
+        ]
+        options: [
+            fill-color: [tuple!]
+        ]
+        draw: [
+            pen edge-color
+            line-width 2.7
+            fill-pen fill-color
+            grad-pen radial viewport-box/center 0 radius area-fill
+            circle viewport-box/center radius
+        ]
+        actors: [
+            on-make: [
+                face/facets/area-fill: select make-material/facet face 'radial-aluminum 'fill-color 'up
+            ]
+            on-resize: [ ; arg is the size
+                do-actor/style face 'on-resize arg 'face ;handle default resizing
+                face/facets/radius: (min arg/y arg/x) - 5 / 2
+            ]
+        ]
+    ]
+]
+view [
+    circle red
+    circle green
+    circle blue
+]</pre><p>The w:actors block defines a few actor functions that are called from the GUI as needed. The first computes the area-fill when the face is created. The second handles resizing, recomputing the size of the face and the diameter of the circle.</p><p>Notice that within the actor functions, the face variables must be referenced via the face object itself.</p><p>You should note the use of f:get-facet for obtaining the area-color. This allows the area color to be obtained from the style facets or from the face facets, depending on if it was changed in the options line. This is the general method for obtaining the attributes of a style.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect6" name="sect6">6. View All Styles</a></h2><div class="note"><div class="message"><p>This section is under construction and the examples doesn't work at the moment.</p></div></div><p>Here's an example that's a little bit extreme. It creates a three column window that shows all predefined viewable styles:</p><pre class="example">all-styles: find extract to-block guie/styles 2 'clicker
+view repend [group 3] [all-styles]</pre><p>We'll let you run it for yourself to see the results (because the window is too large to show in this document.)</p><p>Here's a more elaborate example that creates a list of the predefined styles, then let's you view each one separately.</p><pre class="example">all-styles: find extract to-block guie/styles 2 'clicker
+last-view: none
+view/options [
+    title &quot;Pick a style:&quot;
+    text-list all-styles do [
+        if last-view [unview last-view]
+        style-name: pick all-styles value
+        last-view: view/options reduce [
+            'title reform [&quot;Example of a&quot; style-name &quot;style:&quot;]
+            style-name
+        ][offset: 'center]
+    ]
+][offset: 50x50 size: 200x400]</pre><p>The w:last-view variable provides a way to close the prior windows, otherwise you'd end up with a many windows on top of each other.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><h2><a id="sect7" name="sect7">7. Advanced Examples</a></h2><p>A number of other example styles can be found in the source code to the GUI system. They range from simple styles of just a few lines (e.g. a button) to advanced styles that may require one or two pages (e.g. a scroller).</p><h3><a id="sect7.1" name="sect7.1">7.1 Progress Bar</a></h3><p>A progress bar is just an output display bar that can be set from your program or from other GUI objects.</p><p>Here's an example using the predefined w:progress style:</p><pre class="example">view [
+    prog: progress
+    button &quot;Set 50%&quot; set 'prog 50%
+]</pre><p>Normally, you won't need to create your own progress bar style, but if you did here's an example of what it might look like:</p><pre class="example">stylize [
+    my-progress: [
+        about: &quot;Progress bar.&quot;
+        facets: [
+            init-size: 200x22
+            max-size: 1000x22
+            edge-color: 96.96.96
+            fill-color: 80.80.80.128
+            bar-color: teal
+            bar-size: 1x1 ; modified by the progress % value
+            area-fill: bar-fill: none
+        ]
+        options: [
+            bar-color: [tuple!]
+            size: [pair!]
+        ]
+        draw: [
+            pen edge-color
+            line-width 1.5
+            grad-pen 1x1 0 20 90 area-fill
+            box 1x1 (viewport-box/bottom-right - 1.5) 3
+            grad-pen 1x1 0 20 90 bar-fill
+            box 1x1 bar-size 3
+        ]
+        actors: [
+            on-make: [
+                 face/facets/area-fill: select make-material/facet face 'piano 'fill-color 'up
+                 face/facets/bar-fill: select make-material/facet face 'piano 'bar-color 'up
+            ]
+            on-set: [ ; arg: event
+                ; Update the bar size from the face value.
+                face/state/value: arg/2
+                v: limit to percent! arg/2 0% 100%
+                size: face/facets/viewport-box/bottom-right - 1.5
+                face/facets/bar-size: as-pair v * size/x size/y
+            ]
+        ]
+    ]
+]
+view [
+    prog: my-progress
+    button &quot;Set 50%&quot; set 'prog 50%
+]</pre><h3><a id="sect7.2" name="sect7.2">7.2 Slider bar (numeric value input)</a></h3><p>Here's a much more advanced example that shows how the w:slider style was defined. A slider bar is an input device that for setting a value between 0% and 100%.</p><p>Here's an example using the predefined w:slider style:</p><pre class="example">view [
+    slider attach 'prog
+    prog: progress
+]</pre><p>Normally, you won't need to create your own slider style, but if you did here's an example of what it might look like:</p><pre class="example">stylize [
+    my-slider: [
+        about: &quot;Slide-bar for numeric input (0% - 100%)&quot;
+        facets: [
+            init-size: 200x22
+            max-size: 1000x22
+            edge-color: 96.96.96
+            fill-color: 80.80.80
+            axis: area-fill: none
+            knob-color: red
+            knob-xy:
+            bias-xy: 8x0 ; pointer adjustment at ends
+        ]
+        options: [
+            init-size: [pair!]
+            knob-color: [tuple!]
+        ]
+        draw: [
+            pen edge-color
+            line-width .4
+            grad-pen 1x1 0 4 90 area-fill
+            box 1x1 viewport-box/bottom-right 3
+            line-width 1.5
+            fill-pen knob-color
+            translate knob-xy
+            triangle -6x16 0x2 6x16
+        ]
+        actors: [
+            on-make: [
+                face/facets/area-fill: select make-material/facet face 'piano 'fill-color 'up
+            ]
+            on-resize: [ ; arg: size
+                do-style/style face 'on-resize arg 'face ;handle default resizing
+                face/facets/axis: face-axis? face
+                do-style face 'on-update none
+            ]
+            on-update: [
+                ; Compute the knob offset from face/value:
+                val: limit to percent! any [face/state/value 0] 0% 100%
+                bias: face/facets/bias-xy
+                size: face/facets/viewport-box/bottom-right - bias - bias
+                face/facets/knob-xy: val * size * 1x0 + bias
+            ]
+            on-offset: [ ; arg: offset
+                ; Compute face/value from knob offset:
+                bias: face/facets/bias-xy
+                arg:  max 0x0 arg - bias
+                size: face/facets/viewport-box/bottom-right - bias - bias
+                axis: pick [x y] 'y = get-facet face 'axis
+                face/state/value: val: min 100%
+                max 0% to-percent arg/:axis / size/:axis
+                face/facets/knob-xy: val * size * 1x0 + bias
+            ]
+            on-click: [ ; arg: event
+                do-style face 'on-offset arg/offset
+                if arg/type = 'down [
+                    draw-face face
+                    return init-drag/only face arg/offset
+                ]
+                do-face face
+                ; Click UP: compute percentage value from xy offset none
+                ; handled event
+            ]
+            on-drag: [ ; arg: drag
+                do-style face 'on-offset arg/delta + arg/base
+                draw-face face
+                do-face face
+            ]
+            on-set: [ ; arg: [field value]
+                if all [
+                    'value = first arg
+                    number? second arg
+                ][face/state/value: second arg]
+                do-style face 'on-update none ; will clip value range
+            ]
+        ]
+    ]
+]</pre><pre class="example">view [
+    my-slider attach 'prog
+    prog: progress
+]</pre><p>For details about the actor functions above, see the R3 GUI Actors section. Here is a quick summary of the ones used above:</p><div><table class="stdtable" border="0" cellpadding="0" cellspacing="1"><tr><td>Actor </td><td>Description </td></tr><tr><td>on-resize </td><td>changes the gob and area sizes, then calls update to recompute the knob location. </td></tr><tr><td>on-update </td><td>is a general update function that recomputes the knob location. </td></tr><tr><td>on-offset </td><td>is used during mouse input to convert the mouse position to the actual state value, which is a percentage between 0% and 100%. It also updates the knob location, just to save time. </td></tr><tr><td>on-click </td><td>handles the mouse button when it is clicked in the bar. First, the knob is moved to where the click occurred. Then, if the user starts to drag, the drag operation begins. </td></tr><tr><td>on-drag </td><td>takes care of the drag operation, updating the value as needed, depending on the location of the mouse. </td></tr><tr><td>on-set </td><td>handles setting the slider from another GUI object or from the program. It's main job is to make sure the value is valid, then update the slider.</td></tr></table></div><p>Descriptions of various other functions can be found in the R3 GUI Faces section.</p><div class="top">[ <a href="#top">back to top</a> ]</div><hr /><p class="end">Document formatter copyright <a href="http://www.robertmuench.de">Robert M. M&uuml;nch</a>. All Rights Reserved.<br />XHTML 1.0 Transitional formatted with Make-Doc-Pro Version:1.3.0 on 13-Jan-2013 at 16:01:20</p></body></html>
