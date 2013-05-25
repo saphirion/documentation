@@ -10,7 +10,7 @@ Those pull-requests will be reviewed by the Saphirion team, and if accepted, the
 So, it will be included in our next offical release and published via our web-site (http://development.saphirion.com)
 
 The first thing we start with will be a bunch of documentation files. All written in MDP (make-doc-pro) format.
-These are the files, from which the documentations on our web-site are dynamically generated from.
+These are the files, from which the documentations on our web-site are dynamically generated.
 
 The structure for documentation is:
 documentation/    = stuff that works on R2 and R3
