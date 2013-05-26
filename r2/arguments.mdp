@@ -1,0 +1,106 @@
+Rebol functions and the number of arguments.
+
+    Author: Ladislav Mecir
+    Date: 26/February/2004
+
+===References
+
+Ladislav's articles page is at <a href="index.html">Rebol Articles</a>, where you can find other useful references too.
+
+===Standard number of arguments
+
+For any Rebol function there is a standard number of arguments a function will take. We can find the number by using the NARGS function written by Carl Sassenrath:
+
+    nargs: func [
+        {The number of the function arguments}
+        f [any-function!]
+    ] [
+        -1 + index? any [find first :f refinement! tail first :f]
+    ]
+
+===Actual number of arguments
+
+The ARGS-TAKEN? function uses TFUNC. For more informations see <a href="http://www.compkarori.com/vanilla/display/Function-Attributes">Function Atributes</a>. To be able to use TFUNC you can just execute
+
+    do http://www.fm.tul.cz/~ladislav/rebol/tfunc.r
+
+at the interpreter console.
+
+To be able to find the actual number of arguments a function takes I defined the following function:
+
+    args-taken?: tfunc [
+        {How many arguments a function takes?}
+        f [any-function! word! path!]
+        args [block!]
+        /local test
+    ] [
+        test: make block! 1 + length? args
+        insert/only tail test :f
+        repeat i length? args [
+            insert/only tail test to paren! reduce ['first at args i]
+        ]
+        if error? test: try [do/next test] [throw' test]
+        (length? args) - (length? second test)
+    ]
+
+Let's test the behaviour of the LIST-DIR function:
+
+    nargs :list-dir ; == 1
+    args-taken? :list-dir [%.]
+    ; feedback.r    license.html  nntp.r        notes.html    rebdoc.r
+    ; rebol.exe     rebol.r       setup.html    user.r
+    ; == 1
+
+We have seen, that the LIST-DIR function took the standard number of arguments in this case.
+
+---Unset arguments
+
+The LIST-DIR function is able to take less than standard number of arguments, because its DIR attribute can be of the UNSET! datatype as the ANY-TYPE! declaration suggests:
+
+    args-taken? :list-dir []
+    ; feedback.r    license.html  nntp.r        notes.html    rebdoc.r
+    ; rebol.exe     rebol.r       setup.html    user.r
+    ; == 0
+
+Here the List-dir function took 0 arguments, because we didn't supply more.
+
+---Refinements
+
+A different situation can be observed with function refinements. A function can take more than standard number of arguments in this case:
+
+    nargs :copy ; == 1
+    args-taken? 'copy [[1 2]] ; == 1
+    args-taken? 'copy/part [[1 2] 1] ; == 2
+
+---Operators
+
+If we look at the + operator, we see, that its standard number of arguments is two. The same number we obtain when we check the actual number of arguments taken:
+
+    nargs :+ ; == 2
+    args-taken? :+ [1 2] ; == 2
+
+The exception is the - operator, which acts as unary if we use it as prefix operator:
+
+    nargs :- ; == 2
+    args-taken? :- [1 2] ; == 1
+
+---Data dependent functions
+
+There are special functions in Rebol, that take varying number of arguments depending on the values supplied as arguments:
+
+    nargs :make ; == 2
+    args-taken? :make [word word] ; == 2
+
+If we supply different arguments, MAKE can take three arguments:
+
+    args-taken? :make reduce [function! [] []] ; == 3
+
+Even more curious is the situation with the DO function, which can take unlimited number of arguments:
+
+    nargs :do ; == 1
+    args-taken? :do [1] ; == 1
+    ; compare the following with the operator - behaviour:
+    args-taken? :do reduce [:- 1 2] ; == 3
+    args-taken? :do reduce [:make function! [] []] ; == 4
+
+The end.

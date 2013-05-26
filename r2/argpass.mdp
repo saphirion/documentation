@@ -1,0 +1,105 @@
+REBOL Argument Passing
+
+    Author: Ladislav Mecir
+    Date: 18-May-2006/13:18:02+2:00
+
+===References
+
+Ladislav's articles page is at <a href="index.html">Rebol Articles</a>, where you can find other useful references too.
+
+===Referentially Transparent Argument Passing
+
+Joel Neely in one of his REBOL Mailing List posts defined it as the ability of a function to take the result of an expression as the argument value. I will use his terminology here and call the "normal" argument passing "Referentially Transparent Argument Passing". Example:
+
+    f: func [value [any-type!]] [value]
+    f 1 + 2 ; == 3
+
+Referential transparency causes, that even a cousin of the above function called DTTO and looking too trivial to be useful at the first sight, is successfully used in my implementation of the <a href="build.r">BUILD dialect</a>.
+
+Another way how to characterize the Referentially Transparent Argument Passing is the citation from the REBOL/Core User's Guide: "...the interpreter evaluates the arguments of function and passes them to the function body..."
+
+---Usage
+
+All REBOL functions except for only a few use this argument passing method.
+
+---Advantages
+
+Referential Transparency - a result of an expression can be supplied as an argument value.
+
+Readability - because this method is standard, every "transparent" script, i.e. script using just this argument passing method is more readable than a "nontransparent" script, i.e. a script using "mixed" argument passing.
+
+---Disadvantages
+
+This method does not have any substantial disadvantages.
+
+===Nontransparent Argument Passing
+
+In addition to the above argument passing methods REBOL implements two referentially nontransparent argument passing methods (see <a href="http://www.rebol.com/docs/core23/rebolcore-9.html">Argument Passing</a> in REBOL/Core User's Guide).
+
+#Literal Argument Passing
+
+#Get Argument Passing
+
+===Literal Argument Passing
+
+The REBOL/Core User's Guide specifies Literal Argument Passing as follows: "To specify that an argument not be evaluated, precede the argument name with a single quote (indicates a literal word)."
+
+The above specification suggests, that Literally Passed Arguments are not evaluated, but that is not true in all situations, see the example:
+
+    ; specify a function g taking an argument value literally
+    g: func ['value [any-type!]] [probe :value]
+    x: 1
+    ; in the following case the argument isn't evaluated:
+    g x ; == x
+    ; in the following case the argument *is* evaluated:
+    g :x ; == 1
+
+---Usage
+
+The following natives/mezzanines use Literal Argument Passing: HELP, SOURCE, SECURE, FOR, FOREACH, REPEAT, FORSKIP, FORALL, REMOVE-EACH.
+
+---Advantages
+
+This method is promoted by the REBOL/Core User's Guide as the method to use "For instance, if you need to pass a word and access it from the function body, you do not want it evaluated as an argument."
+
+This example is false, because e.g. the GET function while designed mainly to take a WORD argument does not use Literal Argument Passing because Literal Argument Passing isn't referentially transparent above all.
+
+---Disadvantages
+
+The main disadvantage is the nontransparency, i.e. the fact, that you cannot use a result of an expression as an argument value.
+
+Another disadvantage is the fact, that the method is inconsistent, because it evaluates some argument values as has been demonstrated above, so you cannot use it in case you really wish no value to be evaluated.
+
+In case of the SECURE function above the usage of Literal Argument Passing is not convenient.
+
+Even in case of cycle functions and HELP the convenience is quite questionable, because it restricts the usage. (E.g. somebody may wish to obtain a help or a source for a result of an expression.)
+
+Readability - no script (known to me) uses just this argument passing method, so every script using this method is a "mixed" script using at least two argument passing methods and therefore it is less readable.
+
+===Get Argument Passing
+
+The REBOL/Core User's Guide specifies Get Argument Passing as follows: "...rather than passing a word, the value of the word is passed without being evaluated..."
+
+As opposed to the Literal Argument Passing we may say, that every argument is "evaluated", but the "evaluation" is specific for this argument passing method. 
+
+---Usage
+
+No native/mezzanine uses this argument passing method, which may be taken as a sign that the usability is low.
+
+Since the REBOL/Core User's Guide specification holds, I found out, that this method is useful in case, when I have got a block of words and need to supply the values of the words to a function as its arguments. This is why I used the method in my implementation of the CLOSURE function. The CLOSURE function can be (and originally was) implemented without the Get Argument Passing, but this implementation is both faster and simpler. This usage becomes superfluous in R3 anyway, because CLOSURE is going to be implemented natively. Even in case CLOSURE wasn't implemented natively a kind of the APPLY function (e.g. the APPLY used in the REBCODE dialect) taking a block of words would be more than adequate replacement for the above mentioned usage of the Get Argument Passing method.
+
+---Advantages
+
+See the Usage section above.
+
+---Disadvantages
+
+Nontransparency.
+
+Readability - no script (known to me) uses just this argument passing method, so every script using this method is a "mixed" script using at least two argument passing methods and therefore it is less readable.
+
+===Argument Passing in General
+
+While I don't think that nontransparent argument passing has got sufficiently many advantages, I wrote a function which is able to pass arguments to a function using any argument passing method as well as take care of refinements etc. The function is called <a href="pass-args.r">PASS-ARGS</a>.
+
+The End.
