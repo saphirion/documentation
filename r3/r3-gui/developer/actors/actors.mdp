@@ -1,7 +1,7 @@
 R3 GUI Actors
 
 	Author: Carl Sassenrath, Saphirion AG
-	Date: 20-Jan-2013
+	Date: 25-May-2013
 
 =toc
 
@@ -21,7 +21,9 @@ This document is is for advanced users who plan to implement their own styles an
 
 GUI styles define actors to provide functions that handle events, process input, modify attributes, and setup graphics rendering.
 
-Within a style an w:actor block holds the actor definitions. The block is a collection of actor names followed by their function body blocks. No function creators or argument specifications are needed, the f:make-style function will create those.
+Within a style an w:actors block holds the actor definitions. The block is a collection of actor names followed by their function body blocks. No function creators or argument specifications are needed, the f:make-style function will create those.
+
+Note that actor blocks are treated in the same way as the body block of a Funct or Closure construct so that all set-words used in the actor block are initialized to none.  If you need to set the value of a variable defined outside the layout, you will need to specify a context for that variable or use 'set for those in the global context.
 
 The naming convention for actors begins with w:on- followed by a verb or verb-noun that best describes the action. Examples are: w:on-draw or w:on-view. Although not strictly required, using this convention helps make GUI code more clear.
 
