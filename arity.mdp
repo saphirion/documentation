@@ -74,7 +74,9 @@ Here the *list-dir* function took 0 arguments, because we didn't supply more.
 
 In R2, if a function has one or more arguments that can have the *unset!* datatype at the end of its argument list it is possible to omit some arguments and the interpreter will supply *#[unset!]* values to the function for the omitted arguments.
 
-This is also true for R3 but only for arguments passed using the literal argument passing style or for arguments using the unevaluated passing style. Arguments using the evaluated passing style cannot be omitted even if they are allowed to have the *unset!* datatype.
+This is also true for R3 but only for arguments passed using the literal argument passing style or for arguments using the unevaluated passing style. 
+
+In R3, arguments using the evaluated passing style cannot be omitted even if they are allowed to have the *unset!* datatype.
 
 Example:
 
