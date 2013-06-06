@@ -137,20 +137,15 @@ An example of a variadic function is the *do* function which can take unlimited 
 In R3, we can define our own variadic functions as follows:
 
 	; define a variadic function called sumn
-	use [result collect process] [
-	    collect: func [:value [any-type!]] [
-	        unless value? 'value [return process result]
-	        append/only result :value
-	        return/redo :collect
-	    ]
-	    process: func [block [block!] /local result] [
-	        result: 0
-	        foreach value reduce block [result: result + value]
-	        result
+	use [result arg-adder] [
+	    arg-adder: func [:value [number! none! unset!]] [
+	        unless number? get/any 'value [return result]
+	        result: result + value
+	        return/redo :arg-adder
 	    ]
 	    sumn: func [] [
-	        result: copy []
-	        return/redo :collect
+	        result: 0
+	        return/redo :arg-adder
 	    ]
 	]
 
