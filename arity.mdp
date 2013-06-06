@@ -128,7 +128,7 @@ In R3, we can define our own variadic functions as follows:
 
 	; define a variadic function called sumn
 	use [result arg-adder] [
-	    arg-adder: func [:value [any-type!]] [
+	    arg-adder: func [:value [number! none! unset!]] [
 	        unless number? get/any 'value [return result]
 	        result: result + value
 	        return/redo :arg-adder
