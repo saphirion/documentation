@@ -61,9 +61,9 @@ Let's test the behaviour of the *list-dir* function:
 
 We have seen, that the *list-dir* function took the specified number of arguments in this case.
 
----Unset arguments
+---Unsupplied unset arguments and argument passing styles
 
-The *list-dir* function is able to take less than standard number of arguments, because its *dir* argument can be of the *unset!* datatype as the *any-type!* declaration suggests:
+In both R2 and R3 the *list-dir* function is able to take less than standard number of arguments, because its *dir* argument can be of the *unset!* datatype:
 
     args-taken? :list-dir []
     ; feedback.r    license.html  nntp.r        notes.html    rebdoc.r
@@ -71,6 +71,16 @@ The *list-dir* function is able to take less than standard number of arguments, 
     ; == 0
 
 Here the *list-dir* function took 0 arguments, because we didn't supply more.
+
+In R2, if a function has one or more arguments that can have the *unset!* datatype at the end of its argument list it is possible to omit some arguments and the interpreter will supply *#[unset!]* values to the function for the omitted arguments.
+
+This is also true for R3 but only for arguments passed using the literal argument passing style or for arguments using the unevaluated passing style. Arguments using the evaluated passing style cannot be omitted even if they are allowed to have the *unset!* datatype.
+
+Example:
+
+    f: func [arg [unset!]] []
+	(f)
+    ** Script error: f is missing its arg argument
 
 ---Refinements
 
