@@ -685,10 +685,10 @@ first pair is left/top, second right/bottom value, in pixels
 When a face was updated by changing its dimensions, or otherwise affecting its appearance/handling by its parent layout, the UPDATE-FACE function should be called to "signal" that event to its parent. 
 
 	update-face: funct [
+		{Notifies, updates and shows the parents of the given FACE.}
 		face [object!]
-		/no-show
-		/contents
-		/contents-only
+		/no-show {Do not really update and show.}
+		/content {The given FACE is a layout and its contents changed.}
 	]
 
 When called with the /NO-SHOW refinement, the function just sets the respective flags for the layout resizing algorithm to be able to update the layout.
