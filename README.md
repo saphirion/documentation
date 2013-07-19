@@ -13,6 +13,9 @@ The first thing we start with will be a bunch of documentation files. All writte
 These are the files, from which the documentations on our web-site are dynamically generated.
 
 The structure for documentation is:
-documentation/    = stuff that works on R2 and R3
-documentation/r2	= stuff for R2
-documentation/r3	= stuff for R3
+
+documentation/ = stuff that works on R2 and R3
+
+documentation/r2 = stuff for R2
+
+documentation/r3 = stuff for R3
