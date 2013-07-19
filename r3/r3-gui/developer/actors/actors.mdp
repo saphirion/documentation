@@ -1,7 +1,7 @@
 R3 GUI Actors
 
 	Author: Carl Sassenrath, Saphirion AG
-
+	
 =toc
 
 ===Concept
@@ -423,7 +423,7 @@ The w:on-attached is called on every attached face. It is triggered by w:do-face
 The w:on-click is called each time a mouse button press or release occurs.
 
 :arg - the event object for the mouse click.
-:return - on down, can be none or the drag object. On up, none.
+:return - on down, can be none/false(unfocus is called), true(unfocus is not called) or the drag object. On up, none.
 
 This example prints the button event that occurred:
 

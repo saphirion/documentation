@@ -1,8 +1,7 @@
 R3 GUI Faces
 
 	Author: Carl Sassenrath, Saphirion AG
-	Date: 22-Apr-2011
-
+	
 =toc
 
 ===Concepts
@@ -26,7 +25,7 @@ For example, the GUI dialect code below uses the f:view function to create a sin
 	view [
 		title "Example GUI"
 		field
-		button "Submit" submit
+		button "Submit" on-action [print "submit action"]
 	]
 
 The w:title, w:field, and w:button styles are specified, and the result will be a layout containing three faces, each associated with those style.
@@ -70,7 +69,7 @@ Get a named facet of a face. If not present in the face, get the value from the 
 set-facet |
 Set a named facet of a face. If not defined, create it. ||
 do-face |
-Evaluate the reactor functions for a face. This is provided to allow reactor code from one face to relay actions to another face. ||
+Execute the standard action code sequence of a face. The sequence contains the code that tries to call all attached targets of the face and then the ON-ACTION terminal actor. ||
 draw-face |
 Generate the rendering block for a face, and refresh the face on screen. ||
 extend-face |
@@ -89,20 +88,32 @@ Find the next (or prior) face that responds to a given actor. This is also used 
 
 Each face can have a name. Within a layout, it is useful to refer to a face by its name. For example, a layout that requests a user name and email address might need to refer to those faces within its code.
 
-	name:  field
-	email: field
-	button "Submit" do [
-		unless verify get-face name [warn "invalid name"]
-		unless verify get-face email [warn "invalid email address"]
+	verify: func [
+		data [string!]
+	][
+		;just a placeholder code
+		print "verifying face"
+		random true
+	]
+	
+	view [
+		name:  field
+		email: field
+		button "Submit" on-action [
+			unless verify get-face name [alert "invalid name"]
+			unless verify get-face email [alert "invalid email address"]
+		]
 	]
 
 The w:name and w:email words are layout-local variables that refer to their respective face objects.
 
 Here's another example that attaches a slider to a progress bar. The w:prog name is used by the slider to refer to the progress bar face and change it as necessary:
 
-	text "Drag slider to see progress bar change:"
-	slider attach 'prog
-	prog: progress
+	view [
+		text "Drag slider to see progress bar change:"
+		slider attach 'prog
+		prog: progress
+	]
 
 The more about face names is provided below and in the R3 GUI Layouts page.
 
@@ -114,17 +125,12 @@ The get-face and set-face functions get and set the values of faces. Because the
 
 For example, you can write:
 
-	slid: slider
-	button "Show" do [print get-face slid]
-	button "Full" do [set-face slid 100%]
-	button "Empty" do [set-face slid 0%]
-
-However, it should be noted that there is an even easier way to set the slider that does not require the set-face function:
-
-	button "Full" set 'slid 100%
-	button "Empty" set 'slid 0%
-
-These face reactors are shorthand for the set-face function.
+	view [
+		slid: slider
+		button "Show" on-action [print get-face slid]
+		button "Full" on-action [set-face slid 100%]
+		button "Empty" on-action [set-face slid 0%]
+	]
 
 ===Face Object
 
@@ -190,11 +196,11 @@ word! |
 
 A name used to refer to this specific face. (For example, to get or set its value.) ||
 
-reactors |
+tags |
 
-block! |
+map! |
 
-A block of user actions for this face. ||
+A set of tags related to the face. ||
 
 intern |
 
@@ -285,10 +291,6 @@ What gets stored in the options object is determined by the options field of the
 
 It is permitted for the w:face/options object to be used to reset a face back to its initial value. For example, when resetting the fields of a form. If a style requires this ability, it should always copy its option series values in order to be able to restore them later.
 
-\note
-Note that face actions (reactors) are not stored in this options object.
-/note
-
 ---Name Field
 
 When a face is named, the w:name field holds that name (as a word). Such names can later be used to reference the face object from other faces and functions.
@@ -299,32 +301,20 @@ The name field comes from the set-word used in the dialect. For example, the are
 
 will have the name w:summary. The name can now be used to reset or clear the area:
 
-	button "Reset" reset 'summary
-	button "Clear" clear 'summary
+	button "Reset" on-action [do-actor summary 'on-reset none]
+	button "Clear" on-action [do-actor summary 'on-clear none]
 
 For user coding convenience, the face name spans more than just the layout where it was defined. For example, this code works as you would expect, even though the buttons are part of a sub-layout, not the layout in which the field name was defined:
 
 	vpanel [
 		user: field
 		hpanel [
-			button "Reset" reset 'user
-			button "Clear" clear 'user
+			button "Reset" on-action [do-actor user 'on-reset none]
+			button "Clear" on-action [do-actor user 'on-clear none]
 		]
 	]
 
 In case of compound styles where local name-space is neccessary, this can be done with the w:style/facets/names field. See the layouts document for more information.
-
----Reactors Field
-
-The w:reactors field is a block of names and values for special actions on a face, called reactors.
-
-For example, the line below specifies a w:reset reactor with an argument of w:summary:
-
-	button "Reset" reset 'summary
-
-This information is stored in the reactors block of the face. Multiple reactors may be specified.
-
-Whenever specific events occur, the block is processed to perform various actions. For example, to evaluate code when a button is clicked.
 
 ===Debugging Techniques
 
