@@ -1,0 +1,534 @@
+Discussed Rebol improvements
+
+===INCLUDE
+
+You decided to make it a mezzanine. Source sent separately.
+
+Currently it doesn't use header information. Suggestions/enhancement requests welcome.
+
+===Errors in REBOL
+
+---Error reporting
+
+It would be very useful to get more information than just the top of the call stack when an error occurs. I guess, that it may be implemented in an "on demand" fashion when a user specifies the depth he wants to examine.
+
+---Disarmed errors
+
+Errors accessible to REBOL users (returned as results of REBOL functions like TRY) should be already disarmed. This leads to language simplification and strictness with respect to errors and it removes one exception in the interpreter behaviour.
+
+For the sake of backwards compatibility the DISARM function can be kept but doing nothing in essence.
+
+---Firing errors
+
+Disarmed errors (as above) should be "fired" only using a special native function called FIRE. E.g. a function expecting a non-error value and "obtaining" an error as an argument must not fire the error it obtained, instead it should fire a new "expect-arg error".
+
+The FIRE function should have a refinement causing the fired error to change its NEAR and WHERE properties. The "normal" FIRE usage - i.e. without the refinement - should keep the WHERE and NEAR properties of error unchanged.
+
+---Throwing errors
+
+Currently an expression like
+
+    throw error
+
+may mean that the error is meant either for a function with the [catch] attribute or for a CATCH evaluation. I suggest to discern these two situations by using a different name for every possibility.
+
+---TRY versus DEFAULT
+
+The TRY function is used to handle errors. Another option is to use a DEFAULT function implemented like (another implementation in RAMBO - #3225):
+
+	default: func [
+	    {Execute code. If error occurs, execute fault.}
+	    [throw]
+	    code [block!] {Code to execute}
+	    fault [block!] {Error handler}
+	] [
+	    either error? set/any 'code try code [
+	        fault: make function! [[throw] error [error!]] fault
+			fault code
+	    ] [get/any 'code]
+	]
+
+The trouble with this implementation is, that it is based on TRY, which means, that it cannot handle some situations "properly". Example:
+
+	blk: head insert make block! 0 make error! "an error"
+	default [first blk] [print "handling error"]
+
+In this case the "handling error" message is printed, while a natively implemented DEFAULT function should not evaluate the error handler, because no error was actually fired. On the other hand, in this case:
+
+	default [fire first blk] [print "handling error"]
+
+The error has been fired and therefore the error handler has to be evaluated.
+
+My point was, that a "properly" natively implemented DEFAULT can be used to define a "proper" TRY mezzanine, while the native TRY cannot be used to "properly" define a DEFAULT mezzanine.
+
+This proves, that DEFAULT is "more powerful" than TRY.
+
+There are other related requests in RAMBO (e.g. #3423), that signal there really is a demand for these changes.
+
+===Expression evaluation
+
+(some speed-ups making the code more readable for humans while removing some exceptions)
+
+---NEG or NEGATE as the only unary negation operator
+
+The - operator should not be used as unary.
+
+---Infix operators should not be allowed to be used as prefix.
+
+This means, that e.g.
+
+    + 1 2
+
+should have the same behaviour as
+
+    () + 1 2
+    
+and fire an expect-arg type error.
+
+---OP-WORDs
+
+Such a special word category already exists (in a sense) and contains the following words:
+
+	+ - * / // ** and or xor < <= <> = == =? > >= !=
+
+A "user-driven introduction" of OP-WORDs can be achieved without needing to "search" whether a given word can be found in the above "specific set of words".
+
+It can be done by "officially introducing" the OP-WORD type of words and saying that the above words all have the special OP-WORD type. That way we don't have to "search" if a given word can be found in the above defined set, but simply check the "type" of the word we are examining.
+
+An ALIAS-like "mechanism" can then enable users to "introduce" new OP-WORDS.
+
+---Right associativity for operators
+
+We discussed whether such a change could speed up the interpreter. It looks, that you were right saying, that it may not change the interpreter speed at all, in which case this change isn't advisable.
+
+===Block!
+
+---Speeding up REMOVE
+
+If we introduce a new pointer pointing to the start of the memory block and do not require the block head to be always situated at the start of the memory block, we don't affect the interpreter much, while speeding up the block head remove significantly.
+
+The question when to "make up" the allocated memory block can be left as a job for the garbage collector or postponed until an operation requires to do a bigger copying anyway.
+
+---Blocks and preallocated space
+
+The difference between the behaviour of the two cases below suggests, that the preallocated space should be "a bit" larger:
+
+    m: 4
+    a: make block! m
+    p: does [print " Changed"]
+    insert tail a [(insert tail a 'p prin [last a length? a])]
+    do a
+
+The code prints a line "p 2 Changed", which means, that the code change is "seen" by the interpreter. If we instead use
+
+    m: 3
+    a: make block! m
+    p: does [print " Changed"]
+    insert tail a [(insert tail a 'p prin [last a length? a])]
+    do a
+
+This situation is known for some time, therefore we can see quite a few scripts using idioms like:
+
+	a: make block! m + 2
+
+instead of:
+
+	a: make block! m
+
+To obtain a block with the proper quantity of "empty space".
+
+Proposition: it should be sufficient to increase the preallocated memory for blocks by two without needing to change other things in the interpreter.
+
+===List!
+
+This is a simplified C header file:
+
+	/*
+		Date: 16-Sep-2005/11:29:29+2:00
+		Author: Ladislav Mecir
+		Purpose: Demonstrate a list implementation variant
+	*/
+	
+	/*
+		Special elements:
+		1)	the tail element is recognizable by its address
+			its SUBSEQUENT points to the head element
+		2)	the head element is recognizable by having tail element as PREVIOUS
+		3)	a removed element is recognizable by having NULL in PREVIOUS
+			it contains a desired element pointer in SUBSEQUENT
+	*/
+	
+	struct list_element {
+		struct list_element *previous;
+		REBVAL slot;
+		struct list_element *subsequent;
+	};
+	
+	typedef struct list_element *list_element_ptr;
+	
+	typedef struct {
+		list_element_ptr position;
+		list_element_ptr tail_element;
+	} REBLIST;
+
+And this is a REBOL prototype implementation of the desired behaviour:
+
+	Rebol [
+		Date: 16-Sep-2005/11:29:29+2:00
+		Title: "List!-di"
+		Purpose: {
+			Demonstrate an improved Rebol list implementation
+			See LIST.h
+		}
+	]
+	
+	value-prototype: context [type: none]
+	
+	list-prototype: make value-prototype [
+		type: list!
+		position: none
+		tail-element: none
+	]
+	
+	element-prototype: context [
+		previous: none
+		slot: none
+		subsequent: none
+	]
+	
+	; this is very important code handling "removal consistency"
+	take-care-of-removed: func [list /local predecessor auxiliary] [
+		unless list/position/previous [
+			; traverse removed elements and link them together
+			while [
+				predecessor: list/position
+				list/position: predecessor/subsequent
+				not list/position/previous
+			] [
+				list/position/previous: predecessor
+			]
+			; now list/position is a "regular" list element
+			; traverse back to clean the mess a bit
+			while [predecessor] [
+				predecessor/subsequent: list/position
+				auxiliary: predecessor/previous
+				predecessor/previous: none
+				predecessor: auxiliary
+			]
+		]
+	]
+	
+	make-empty-list-model: func [/local list-tail-element] [
+		list-tail-element: make element-prototype [
+			previous: self
+			subsequent: self
+		]
+		make list-prototype [
+			position: list-tail-element
+			tail-element: list-tail-element
+		]
+	]
+	
+	tail?-model: func [list] [
+		take-care-of-removed list
+		list/position = list/tail-element
+	]
+	
+	head?-model: func [list] [
+		take-care-of-removed list
+		list/position/previous = list/tail-element
+	]
+	
+	tail-model: func [list] [make list [position: list/tail-element]]
+	
+	head-model: func [list] [make list [position: list/tail-element/subsequent]]
+	
+	next-model: func [list] [
+		take-care-of-removed list
+		either list/position = list/tail-element [list] [
+			make list [position: list/position/subsequent]
+		]
+	]
+	
+	back-model: func [list] [
+		take-care-of-removed list
+		either list/position/previous = list/tail-element [list] [
+			make list [position: list/position/previous]
+		]
+	]
+	
+	; SKIP, INDEX? and EMPTY? functions can be implemented using the above 	functions,
+	; that is why I do not implement their models
+	
+	first-model: func [
+		[catch]
+		list
+	] [
+		take-care-of-removed list
+		if list/position = list/tail-element [throw make error! "out of range"]
+		list/position/slot
+	]
+	
+	remove-model: func [list /local result] [
+		take-care-of-removed list
+		if list/position = list/tail-element [return list]
+		result: list/position/subsequent
+		result/previous: list/position/previous
+		list/position/previous: none
+		make list [position: result]
+	]
+	
+	insert-model: func [list value /local new-element] [
+		take-care-of-removed list
+		new-element: make element-prototype [
+			previous: list/position/previous
+			slot: value
+			subsequent: list/position
+		]
+		list/position/previous: new-element
+		new-element/previous/subsequent: new-element
+		list
+	]
+	
+	same?-model: func [list1 list2] [
+		take-care-of-removed list1
+		take-care-of-removed list2
+		list1/position = list2/position
+	]
+	
+	to-block-model: func [list /local result] [
+		result: copy []
+		while [not tail?-model list] [
+			insert tail result first-model list
+			list: next-model list
+		]
+		result
+	]
+	
+	comment [
+		;consistency requirements:
+		list1: make-empty-list-model
+		to-block-model list1 ; == []
+		insert-model insert-model insert-model list1 1 2 3
+		list1: head-model list1
+		to-block-model list1 ; == [1 2 3]
+		list2: back-model next-model list1
+		same?-model list1 list2 ; == true
+		list3: head-model insert-model remove-model remove-model head-model list1 4
+		to-block-model list3 ; == [4 3]
+		same?-model list1 list2 ; == true
+		to-block-model list1 ; == [3]
+		to-block-model list2 ; == [3]
+	]
+
+===Hash!
+
+Some people prefer to have keys and their associated values "separated", i.e. to have something like a "dynamic object" or MAP or Associative Array type instead.
+
+Such a datatype would be more efficient than a "combined" hash, because it would need to do fast searches only in the KEYS part.
+
+See e.g. my mezzanine implementation of an associative array in: <a href="http://www.compkarori.com/vanilla/display/aa.r">http://www.compkarori.com/vanilla/display/aa.r</a>
+
+===User Definable Datatypes
+
+---Value parsing
+
+Example of that may be an introduction of a COMPLEX! datatype as follows:
+
+	0.5j1.3
+
+This resembles the PAIR! datatype that is already there and looks pretty elegant. As you noted it would need a "hook up" mechanism in the parser.
+
+---Datatype checking
+
+It would require from the user to define a COMPLEX? function able to "recognize" a value of this datatype, i.e. yield TRUE for a complex value and FALSE otherwise.
+
+==="Closure" functions
+
+We agreed on the fact that the name isn't proper, because they are just "normal" functions binding (and copying) their body every time they are called.
+
+Closures are useful as callback generators in async code, e.g. 
+
+Here is my mezzanine implementation:
+
+	Rebol [
+	    Title: "Closure"
+	    File: %closure.r
+	    Date: 16-Aug-2005/20:29:51+2:00
+	    Author: "Ladislav Mecir"
+	    Purpose: {
+	        CLOSURE is suggested instead of FUNC when you need functions
+			exhibiting async behaviour,	e.g. for:
+			- View
+			- Async Ports
+			- Higher Order Functions
+			
+			Closures differ from "normal" Rebol functions by using a fresh
+			context every time they are called.
+			
+			Rule Of Thumb: if your function is returning a new function, block, or
+			a local word, you will be safe if it is a closure.
+	    }
+	]
+	
+	#include-check %default.r
+	
+	closure: func [
+	    [catch]
+	    spec [block!] {Help string (opt) followed by arg words (and opt type and 	string)}
+	    body [block!] {The body block of the closure}
+	    /local spc result item
+	] [
+	    spc: make block! 1 + (2 * length? spec)
+	    insert/only spc [throw]
+	    result: make block! 5 + length? spec
+	    insert result reduce ['do 'make 'function! spc body]
+	    parse spec [
+	        any [
+	            set item any-word! (
+	                insert tail result to word! :item
+	                insert tail spc to get-word! :item
+	                insert/only tail spc [any-type!]
+	            ) | skip
+	        ]
+	    ]
+	    result: default [make function! spec result] [throw error]
+	    change second :result [do make function!]
+	    :result
+	]
+	
+	comment [
+	    ; Examples:
+	
+	    f-maker: func [x][does [x]]
+	    f-ok: f-maker "OK"
+	    f-bug: f-maker "BUG"
+	    f-ok ; == "BUG"
+	    
+	    c-maker: closure [x][does [x]]
+	    c-ok: c-maker "OK"
+	    c-bug: c-maker "BUG"
+	    c-ok ; == "OK"
+	    
+	    block: copy []
+	    f: closure [x] [
+	        if x = 2 [f 1]
+	        insert tail block 'x
+	    ]
+	    f 2
+	    print block ; 1 2
+	    
+	    ; Tests:
+	    f: closure [x [any-type!]] [type? get/any 'x]
+	    f () ; == unset!
+	    f make error! "" ; == error!
+	    f first [:x] ; == get-word!
+	    f first [x:] ; == set-word!
+	    f: closure [do make function! spc body] [
+	        print [do make function! spc body]
+	    ]
+	    f 0 1 2 3 4 ; 0 1 2 3 4
+	]
+
+===LFUNC function
+
+I have defined a "comfortable" LFUNC function using make object! - alike behaviour having the following properties:
+
+	>> help lfunc
+	USAGE:
+	    LFUNC spec init body /handle
+	
+	DESCRIPTION:
+	     Define a function with auto local and static variables.
+	     LFUNC is a function value.
+	
+	ARGUMENTS:
+	     spec -- Help string (opt) followed by arg words with opt type and string (Type: block)
+	     init -- Set-words become static variables, subblocks not scanned (Type: block)
+	     body -- Set-words become local variables, subblocks not scanned (Type: block)
+	
+	REFINEMENTS:
+	     /handle -- Handle errors using catch/default
+
+Example usage:
+
+    counter: lfunc [] [v: 0] [
+        v: v + 1
+        print v
+    ]
+    counter ; == 1
+    counter ; == 2
+    counter ; == 3
+    v
+	** Script Error: v has no value
+	** Near: v
+
+In this case the 'v variable became a static local variable of the function.
+
+===Function with local RETURN, THROW
+
+Functions of this type may be slower to define (two more variables to bind), but simpler and faster to use, evaluate and debug.
+
+My article <a href="http://www.compkarori.com/vanilla/display/Function-Attributes">http://www.compkarori.com/vanilla/display/Function-Attributes</a> shows some differences.
+
+Similar flexibility difference is observable for CATCH with local THROW too (We are using such an approach in BEER e.g.).
+
+===Binding versus searching
+
+---Searching BIND
+
+When a binding operation like:
+
+	bind block context
+
+occurs, the "normal" (searching) algorithm can be guessed to be O(M * log-2 N).
+
+M is the "combined" length of the BLOCK (the length of the BLOCK plus the sum of combined lengths of all subblocks and subparens of the block). 
+
+N is the "size" of CONTEXT.
+
+---BIND not using searching
+
+The symbol table can be implemented to contain "reserved space for binding informations" containing just NULLs.
+
+When the BIND operation is performed, the CONTEXT is "scanned" and the reserved spaces for all context words are set. This operation is O(N). Next, the block is scanned using the information in the symbol table. This operation is O(M). Then the symbol table reset is performed, which is another O(N) operation. The total "price" of "searchless" BIND is thus O(M + N).
+
+---Comparison
+
+In case (M + N) <= (M * log-2 N), it is better to use the "searchless" BIND, while in case (M + N) > (M * log-2 N) the searching algorithm is faster.
+
+===Word type conversion
+
+There are some requests to keep binding when converting word datatypes, although that isn't totally necessary when the BIND function has been enhanced to use all word types.
+
+===Parse enhancements
+
+I am proposing especially these three:
+
+#generalization of TO and THRU keywords
+
+#a new NOT keyword
+
+#a new LIT keyword (just for block parsing, because string parsing already has got this feature)
+
+Example usage of LIT keyword:
+
+	parse [1 2 3] [lit [1 2 3]] ; == true
+
+Example usage of the NOT keyword:
+
+	parse "ab" [not [any "a" "b"]] ; == false
+
+See <a href="http://www.compkarori.com/vanilla/display/TO%2C+THRU+And+NOT+PARSE+Rules">http://www.compkarori.com/vanilla/display/TO%2C+THRU+And+NOT+PARSE+Rules</a> for more examples.
+
+===BUILD dialect
+
+This is a comfortable variant (especially for beginners) of COMPOSE. See <a href="http://www.fm.vslib.cz/~ladislav/rebol/build.r">http://www.fm.vslib.cz/~ladislav/rebol/build.r</a>
+
+===Really decimal datatype
+
+A computationally efficient variant of this could be a pair of two integer numbers: 64-bit mantissa (signed integer) and 32-bit decimal exponent (signed integer).
+
+Such numbers should be unnormalized to allow things like 1.00 versus 1.0, where the former is supposed to be more precise than the latter, having one more "place".
+
+The End
