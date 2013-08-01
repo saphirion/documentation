@@ -22,11 +22,7 @@ This is the easiest problem to correct, it suffices to remove the binding restri
 
 ===VALUE? adjustment
 
-The simplest way how to correct this one could be to let the expression
-
-    get/any out-of-scope-function-variable
-
-to yield #[unset!]. This shall correct the VALUE? function behaviour as well.
+This is also easy to correct, it requires just an adjustment to the VALUE? rebnative.
 
 ===Frame reference adjustment
 
