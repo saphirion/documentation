@@ -1,0 +1,45 @@
+R3 function datatype revamp
+
+	Author: Ladislav Mecir
+
+=toc
+
+===Introduction
+
+Problems related to the current implementation of the R3 function! datatype are:
+
+# slow variable access - as http://issue.cc/r3/1946 discusses. This is a serious problem, since interpreters can be expected to be slower than native code, but the speed ratio should be O(1) not O(n). The greatest trouble is that the more work the function does the more its speed becomes impaired. There is a way how to correct the implementation so that the variable access becomes O(1) without visibly changing other aspects of the behaviour needing quite negligible amount of additional storage.
+
+# every function has got a value identifying a function frame to belong to a specific function. It turns out that the function body is used for the purpose. However, in R3 it is possible to create two different functions sharing the same body, which indicates that the choice of function body is not a fortunate value to use when needing to identify the function. This problem is described in http://issue.cc/r3/2025
+
+# the VALUE? function is described to return #[false] when a specific variable does not refer to a value. However, when applied to function-local variables, the VALUE? function does not return #[false] in such case, instead it triggers an error. This problem is described in http://issue.cc/r3/1914
+
+# The BIND function does not bind to function-words when out-of-scope. This is pretended to be a safety measure, but it, in fact, provably does not add any safety at all. This is discussed in http://issue.cc/r3/1893
+
+===BIND adjustment
+
+This is the easiest problem to correct, it suffices to remove the binding restriction from the interpreter code.
+
+===VALUE? adjustment
+
+The simplest way how to correct this one could be to let the expression
+
+    get/any out-of-scope-function-variable
+
+to yield #[unset!]. This shall correct the VALUE? function behaviour as well.
+
+===Frame reference adjustment
+
+Every function has got a block containing all its local words. This block is generated from the SPEC block of the function and it actually is unique for the function in the sense that two functions sharing the same SPEC block still have discernible WORDS blocks. Using the WORDS block as the function frame reference is the way how to make sure the frame reference is unique for every function.
+
+===Variable access
+
+The implementation of the function! datatype and function variable access was chosen to facilitate multithreaded interpretation.
+
+Between other things, R3 interpreter is already keeping track of currently running thread by maintaining a thread identifier, a C pointer identifying the currently running thread.
+
+A possible way how to make function-local variable access O(1) is to maintain two additional values per every R3 function! value:
+
+# the FRAME_THREAD pointer is equal to the pointer to the currently running thread if and only if the respective function is in scope, i.e., when it is running in the currently running thread
+
+# the FRAME_REFERENCE value refers to the stack frame 
