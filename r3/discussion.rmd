@@ -197,24 +197,27 @@ And this is a REBOL prototype implementation of the desired behaviour:
 	]
 	
 	; this is very important code handling "removal consistency"
-	take-care-of-removed: func [list /local predecessor auxiliary] [
+	take-care-of-removed: func [list /local element regular subsequent] [
 		unless list/position/previous [
-			; traverse removed elements and link them together
+			; the list points to a removed element, clean up
+
+			; find the regular element
+			element: list/position
+			until [element: element/subsequent element/previous]
+			regular: element
+
+			; let all removed elements encountered point to the regular element
+			element: list/position
 			while [
-				predecessor: list/position
-				list/position: predecessor/subsequent
-				not list/position/previous
+				subsequent: element/subsequent
+				subsequent <> regular
 			] [
-				list/position/previous: predecessor
+				element/subsequent: regular
+				element: subsequent
 			]
-			; now list/position is a "regular" list element
-			; traverse back to clean the mess a bit
-			while [predecessor] [
-				predecessor/subsequent: list/position
-				auxiliary: predecessor/previous
-				predecessor/previous: none
-				predecessor: auxiliary
-			]
+
+			; adjust the list position to point to the regular element
+			list/position: regular
 		]
 	]
 	
