@@ -34,12 +34,6 @@ Every function has got a block containing all its local words. This block is gen
 
 ===Variable access
 
-The implementation of the function! datatype and function variable access was chosen to facilitate multithreaded interpretation.
+It looks that the implementation of the function! datatype and function variable access was chosen to facilitate multithreaded interpretation.
 
-Between other things, R3 interpreter is already keeping track of currently running thread by maintaining a thread identifier, a C pointer identifying the currently running thread.
-
-A possible way how to make function-local variable access O(1) is to maintain two additional values per every R3 function! value:
-
-# the FRAME_THREAD pointer is equal to the pointer to the currently running thread if and only if the respective function is in scope, i.e., when it is running in the currently running thread
-
-# the FRAME_REFERENCE value refers to the stack frame 
+The effect was achieved by every function variable access traversing the stack until finding the respective function frame. This, for example, means that the access to an out-of-scope function variable traverses the whole stack to find out the variable does not have a value.
