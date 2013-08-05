@@ -8,13 +8,17 @@ R3 function datatype revamp
 
 Problems related to the current implementation of the R3 function! datatype are:
 
-# slow variable access - as http://issue.cc/r3/1946 discusses. This is a serious problem, since interpreters can be expected to be slower than native code, but the speed ratio should be O(1) not O(n). The greatest trouble is that the more work the function does the more its speed becomes impaired. There is a way how to correct the implementation so that the variable access becomes O(1) without visibly changing other aspects of the behaviour needing quite negligible amount of additional storage. Also, the VALUE? function is slow - it needs to traverse the whole stack to find out a function variable is out of scope.
+# Slow variable access - as http://issue.cc/r3/1946 discusses. This is a serious problem, since interpreters can be expected to be slower than native code, but the speed ratio should be O(1) not O(n). The greatest trouble is that the more work the function does the more its speed becomes impaired. There is a way how to correct the implementation so that the variable access becomes O(1) without visibly changing other aspects of the behaviour needing quite negligible amount of additional storage. Also, the VALUE? function is slow - it needs to traverse the whole stack to find out a function variable is out of scope.
 
-# every function has got a value identifying a function frame to belong to a specific function. It turns out that the function body is used for the purpose. However, in R3 it is possible to create two different functions sharing the same body, which indicates that the choice of function body is not a fortunate value to use when needing to identify the function. This problem is described in http://issue.cc/r3/2025
+# Every function has got a value identifying a function frame to belong to a specific function. It turns out that the function body is used for the purpose. However, in R3 it is possible to create two different functions sharing the same body, which indicates that the choice of function body is not a fortunate value to use when needing to identify the function. This problem is described in http://issue.cc/r3/2025
 
-# the VALUE? function is described to return #[false] when a specific variable does not refer to a value. However, when applied to function-local variables, the VALUE? function does not return #[false] in such case, instead it triggers an error. This problem is described in http://issue.cc/r3/1914
+# The VALUE? function is described to return #[false] when a specific variable does not refer to a value. However, when applied to function-local variables, the VALUE? function does not return #[false] in such case, instead it triggers an error. This problem is described in http://issue.cc/r3/1914
 
 # The BIND function does not bind to function-words when out-of-scope. This is pretended to be a safety measure, but it, in fact, provably does not add any safety at all. This is discussed in http://issue.cc/r3/1893
+
+# The COPY action spec in R3 allows any-function VALUE argument values. However, as http://issue.cc/r3/2043 describes, supplying a function to the COPY action crashes the interpreter.
+
+# In the c-function.c file there is a Clone_Function function probably used when objects are cloned. Clone_Function creates a new function sharing both the spec and args values with the original func argument. This makes any of the spec and args values unsuitable to identify a function. Ticket #2025 demonstrates that the body value cannot identify a function either. R3 function values consist only of spec args and body values. Thus, there is nothing left to use as the frame reference value needed for function variables to identify the function to which they belong.
 
 ===BIND adjustment
 
@@ -26,7 +30,7 @@ This is also easy to correct, it requires just an adjustment to the VALUE? rebna
 
 ===Frame reference adjustment
 
-Every function has got a block containing all its local words. This block is generated from the SPEC block of the function and it actually is unique for the function in the sense that two functions sharing the same SPEC block still have discernible WORDS blocks. Using the WORDS block as the function frame reference is the way how to make sure the frame reference is unique for every function.
+In my opinion, the best solution of the problem is to adjust the Clone_Function implementation to copy the args value of the original func argument to make sure the args value identifies the function to which it belongs and to use it as the frame reference of function-local variables.
 
 ===Variable access
 
