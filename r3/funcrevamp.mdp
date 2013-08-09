@@ -20,6 +20,8 @@ Problems related to the current implementation of the R3 function! datatype are:
 
 # In the c-function.c file there is a Clone_Function function probably used when objects are cloned. Clone_Function creates a new function sharing both the spec and args values with the original func argument. This makes any of the spec and args values unsuitable to identify a function. Ticket #2025 demonstrates that the body value cannot identify a function either. R3 function values consist only of spec args and body values. Thus, there is nothing left to use as the frame reference value needed for function variables to identify the function to which they belong.
 
+# As http://issue.cc/r3/2045 demonstrates, object cloning does not work as expected.
+
 ===BIND adjustment
 
 This is the easiest problem to correct, it suffices to remove the binding restriction from the interpreter code.
@@ -37,3 +39,11 @@ In my opinion, the best solution of the problem is to adjust the Clone_Function 
 It looks that the implementation of the function! datatype and function variable access was chosen to facilitate multithreaded interpretation.
 
 The effect was achieved by every function variable access traversing the stack until finding the respective function frame. This, for example, means that the access to an out-of-scope function variable traverses the whole stack to find out the variable does not have a value.
+
+===Rebinding
+
+For object cloning and closure-doing code it is optimal to use rebinding for the following reasons:
+
+* rebinding is faster than binding (no word search in context needs to be performed)
+* rebinding is more "natural" and "intellingent", only the words bound to the source context (the object being cloned) get rebound to the dst context (the clone), which is what a user expects in such cases, leaving words from other contexts untouched
+* rebinding is less "brittle" than binding (the "fast binding algorithm" I proposed and Carl used is not as fast and reentrant as rebinding)
