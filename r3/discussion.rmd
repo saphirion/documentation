@@ -10,7 +10,7 @@ Currently it doesn't use header information. Suggestions/enhancement requests we
 
 ---Error reporting
 
-It would be very useful to get more information than just the top of the call stack when an error occurs. I guess, that it may be implemented in an "on demand" fashion when a user specifies the depth he wants to examine.
+It would be very useful to get more information than just the top of the call stack when an error occurs. I guess that it may be implemented in an "on demand" fashion when a user specifies the depth he wants to examine.
 
 ---Disarmed errors
 

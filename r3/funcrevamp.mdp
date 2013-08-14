@@ -22,6 +22,8 @@ Problems related to the current implementation of the R3 function! datatype are:
 
 # As http://issue.cc/r3/2045 demonstrates, object cloning does not work as expected.
 
+# As demonstrates, closures are not as compatible with functions as desired.
+
 ===BIND adjustment
 
 This is the easiest problem to correct, it suffices to remove the binding restriction from the interpreter code.
@@ -38,12 +40,76 @@ In my opinion, the best solution of the problem is to adjust the Clone_Function 
 
 It looks that the implementation of the function! datatype and function variable access was chosen to facilitate multithreaded interpretation.
 
-The effect was achieved by every function variable access traversing the stack until finding the respective function frame. This, for example, means that the access to an out-of-scope function variable traverses the whole stack to find out the variable does not have a value.
+The effect was achieved by every function variable access traversing the stack until finding the respective function frame. This currently means that every access to a value of an out-of-scope function variable traverses the whole stack to find the corresponding function frame. For example, if the variable is out of scope, whole stack is traversed.
 
-===Rebinding
+===Using rebinding for object cloning
 
-For object cloning and closure-doing code it is optimal to use rebinding for the following reasons:
+For object cloning it is optimal to use rebinding for the following reasons:
 
 * rebinding is faster than binding (no word search in context needs to be performed)
 * rebinding is more "natural" and "intellingent", only the words bound to the source context (the object being cloned) get rebound to the dst context (the clone), which is what a user expects in such cases, leaving words from other contexts untouched
 * rebinding is less "brittle" than binding (the "fast binding algorithm" I proposed and Carl used is not as fast and reentrant as rebinding)
+
+===Using rebinding for compatibility between functions and closures
+
+In R2 it is possible to construct a function so that every word in the function body is bound as desired. This is a useful property allowing to make functions with some special properties. Here is a simplified example:
+
+    ; example of an R2 function with "special binding" of its body
+	; create a function with "normally" bound body
+    f: func [value] [value + value]
+    ; some tests
+    f 1 ; == 2
+    f 2 ; == 4
+    f 3 ; == 6
+	; the original of the function body
+	f-body: second :f
+    ; adjust the binding
+    change f-body 'value
+    value: 1
+    ; some tests
+    f 1 ; == 2
+    f 2 ; == 3
+    f 3 ; == 4
+
+For security reasons Carl adjusted the BODY-OF function so that it does not return the original of the function body. However, the special binding is available using slightly different approach:
+
+    ; example of an R3 function with "special binding" of its body
+	; create a function with "normally" bound body
+    ; and keep the original of its body for future use
+    f: make function! reduce [[value] f-body: [value + value]]
+    ; some tests
+    f 1 ; == 2
+    f 2 ; == 4
+    f 3 ; == 6
+    ; adjust the binding
+    change f-body 'value
+    value: 1
+    ; some tests
+    f 1 ; == 2
+    f 2 ; == 3
+    f 3 ; == 4
+
+So we see that while the security is higher in R3, it is still possible to define functions with special properties. However, when defining a closure in R3 and using the same approach, we get:
+
+    ; example of an R3 closure with "special binding" of its body
+	; create a function with "normally" bound body
+    ; and keep the original of its body for future use
+    f: make closure! reduce [[value] f-body: [value + value]]
+    ; some tests
+    f 1 ; == 2
+    f 2 ; == 4
+    f 3 ; == 6
+    ; adjust the binding
+    change f-body 'value
+    value: 1
+    ; some tests
+    f 1 ; == 2
+    f 2 ; == 4
+    f 3 ; == 6
+
+I consider this as an incompatibility between closures and functions ignoring the adjustments made to the closure body.
+
+These changes can be made to resolve the incompatibility:
+
+# when making the closure, bind the body to the args (pseudo) frame
+# when calling the closure, deep copy its body, create a new "real" context and rebind the new copy to it
