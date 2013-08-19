@@ -8,29 +8,35 @@ R3 function datatype revamp
 
 Problems related to the current implementation of the R3 function! datatype are:
 
-# Slow variable access - as http://issue.cc/r3/1946 discusses. This is a serious problem, since interpreters can be expected to be slower than native code, but the speed ratio should be O(1) not O(n). The greatest trouble is that the more work the function does the more its speed becomes impaired. There is a way how to correct the implementation so that the variable access becomes O(1) without visibly changing other aspects of the behaviour needing quite negligible amount of additional storage. Also, the VALUE? function is slow - it needs to traverse the whole stack to find out a function variable is out of scope.
+# Slow variable access - as http://issue.cc/r3/1946 discusses. This is a problem, since interpreters can be expected to be slower than native code, but the speed ratio should be O(1) not O(n). The greatest trouble is that the more work the function does the more its speed becomes impaired. There is a way how to improve the implementation so that the variable access becomes significantly faster without visibly changing other aspects of the behaviour needing quite negligible amount of additional storage. Also, the VALUE? function is slow - it needs to traverse the whole stack to find out a function variable is out of scope.
 
-# Every function has got a value identifying a function frame to belong to a specific function. It turns out that the function body is used for the purpose. However, in R3 it is possible to create two different functions sharing the same body, which indicates that the choice of function body is not a fortunate value to use when needing to identify the function. This problem is described in http://issue.cc/r3/2025
+# Every function variable has got a frame attribute identifying the function frame. At the time of this writing the function body is used for the purpose. However, in R3 it is possible to create two different functions with different sets of variables sharing the same body, which indicates that the function body is not suitable when needing to identify the function frame. This is a significant security problem and it is described in http://issue.cc/r3/2025
 
 # The VALUE? function is described to return #[false] when a specific variable does not refer to a value. However, when applied to function-local variables, the VALUE? function does not return #[false] in such case, instead it triggers an error. This problem is described in http://issue.cc/r3/1914
 
-# The BIND function does not bind to function-words when out-of-scope. This is pretended to be a safety measure, but it, in fact, provably does not add any safety at all. This is discussed in http://issue.cc/r3/1893
+# The BIND function does not bind to function-words when they are out-of-scope. This is pretended to be a safety measure, but it, in fact, provably does not add any safety at all. This is discussed in http://issue.cc/r3/1893
 
 # The COPY action spec in R3 allows any-function VALUE argument values. However, as http://issue.cc/r3/2043 describes, supplying a function to the COPY action crashes the interpreter.
 
-# In the c-function.c file there is a Clone_Function function probably used when objects are cloned. Clone_Function creates a new function sharing both the spec and args values with the original func argument. This makes any of the spec and args values unsuitable to identify a function. Ticket #2025 demonstrates that the body value cannot identify a function either. R3 function values consist only of spec args and body values. Thus, there is nothing left to use as the frame reference value needed for function variables to identify the function to which they belong.
+# In the c-function.c file there is a Clone_Function function used when objects are cloned. Clone_Function creates a new function sharing both the spec and args values with the original func argument. This makes any of the spec and args values unsuitable to identify a function. Ticket #2025 demonstrates that the body value cannot identify a function either. R3 function values consist only of spec, args and body values. Thus, if we don't adjust the implementation, there is nothing left to use as the frame reference value needed for function variables to identify the function frame to which they belong. See http://issue.cc/r3/2044 discussing this issue.
 
-# As http://issue.cc/r3/2045 demonstrates, object cloning does not work as expected.
+# As http://issue.cc/r3/2045 demonstrates, object cloning does not work as expected not using rebinding, which causes unexpected effects.
 
-# As demonstrates, closures are not as compatible with functions as desired.
+# As http://issue.cc/r3/1863 demonstrates, multiple inheritance (object cloning with another object used as the spec argument) does not work as expected.
+
+# As http://issue.cc/r3/2048 demonstrates, closures are not as compatible with functions as desired.
+
+# As http://issue.cc/r3/2049 demonstrates, the interpreter ignores closures when cloning objects at present.
+
+# As http://issue.cc/r3/2050 demonstrates, the interpreter just shallow-copies functions when cloning objects, while it deep-binds them. This leads to bugs shown in the ticket.
 
 ===BIND adjustment
 
-This is the easiest problem to correct, it suffices to remove the binding restriction from the interpreter code.
+It suffices to remove the binding restriction from the interpreter code.
 
 ===VALUE? adjustment
 
-This is also easy to correct, it requires just an adjustment to the VALUE? rebnative.
+This requires an adjustment to the VALUE? rebnative.
 
 ===Frame reference adjustment
 
@@ -40,14 +46,14 @@ In my opinion, the best solution of the problem is to adjust the Clone_Function 
 
 It looks that the implementation of the function! datatype and function variable access was chosen to facilitate multithreaded interpretation.
 
-The effect was achieved by every function variable access traversing the stack until finding the respective function frame. This currently means that every access to a value of an out-of-scope function variable traverses the whole stack to find the corresponding function frame. For example, if the variable is out of scope, whole stack is traversed.
+The effect was achieved by every function variable access traversing the stack until finding the respective function frame. This currently means that every access to a value of an out-of-scope function variable traverses the whole stack trying to find the corresponding function frame.
 
 ===Using rebinding for object cloning
 
 For object cloning it is optimal to use rebinding for the following reasons:
 
-* rebinding is faster than binding (no word search in context needs to be performed)
-* rebinding is more "natural" and "intellingent", only the words bound to the source context (the object being cloned) get rebound to the dst context (the clone), which is what a user expects in such cases, leaving words from other contexts untouched
+* rebinding is faster than binding (no word search in context needs to be performed in the single inheritance case)
+* rebinding is more "natural" and "intelligent", only the words bound to the source context (the object being cloned) get rebound to the dst context (the clone), which is what a user expects in such cases, leaving words from other contexts untouched
 * rebinding is less "brittle" than binding (the "fast binding algorithm" I proposed and Carl used is not as fast and reentrant as rebinding)
 
 ===Using rebinding for compatibility between functions and closures
@@ -92,7 +98,7 @@ For security reasons Carl adjusted the BODY-OF function so that it does not retu
 So we see that while the security is higher in R3, it is still possible to define functions with special properties. However, when defining a closure in R3 and using the same approach, we get:
 
     ; example of an R3 closure with "special binding" of its body
-	; create a function with "normally" bound body
+	; create a "normal" closure
     ; and keep the original of its body for future use
     f: make closure! reduce [[value] f-body: [value + value]]
     ; some tests
@@ -113,3 +119,20 @@ These changes can be made to resolve the incompatibility:
 
 # when making the closure, bind the body to the args (pseudo) frame
 # when calling the closure, deep copy its body, create a new "real" context and rebind the new copy to it
+
+===Object cloning, single inheritance
+
+When cloning an object, functions seem to be only shallow-cloned while they are deep bound afterwards. This leads to bugs. There are two solutions available:
+
+# use both deep copying of functions and deep binding when cloning
+# use just shallow copying of functions and shallow binding when cloning
+
+I prefer the former alternative, it is the one users expect.
+
+===Object cloning, multiple inheritance
+
+This is the case when an expression like
+
+	make object1 object2
+
+is evaluated, producing an object that should be a clone of both OBJECT1 and OBJECT2. In this case I also prefer rebinding as the most correct and fast solution. Also, the deepversus shallow copy/bind shall be solved the same way as for single inheritance.
