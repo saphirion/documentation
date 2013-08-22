@@ -53,7 +53,7 @@ The effect was achieved by every function variable access traversing the stack u
 For object cloning it is optimal to use rebinding for the following reasons:
 
 * rebinding is faster than binding (no word search in context needs to be performed in the single inheritance case)
-* rebinding is more "natural" and "intelligent", only the words bound to the source context (the object being cloned) get rebound to the dst context (the clone), which is what a user expects in such cases, leaving words from other contexts untouched
+* rebinding is more "intelligent" than binding, putting the current binding of words to good use. Only the words bound to the source context (the object being cloned) get rebound to the destination context (the clone), which is what a user expects in such cases, leaving words bound to other, unrelated contexts untouched
 * rebinding is less "brittle" than binding (the "fast binding algorithm" I proposed and Carl used is not as fast and reentrant as rebinding)
 
 ===Using rebinding for compatibility between functions and closures
@@ -113,7 +113,7 @@ So we see that while the security is higher in R3, it is still possible to defin
     f 2 ; == 4
     f 3 ; == 6
 
-I consider this as an incompatibility between closures and functions ignoring the adjustments made to the closure body.
+This is as an incompatibility between closures and functions ignoring the adjustments made to the closure body.
 
 These changes can be made to resolve the incompatibility:
 
@@ -127,12 +127,14 @@ When cloning an object, functions seem to be only shallow-cloned while they are 
 # use both deep copying of functions and deep binding when cloning
 # use just shallow copying of functions and shallow binding when cloning
 
-I prefer the former alternative, it is the one users expect.
+I prefer the former alternative, it is the one users expect, it is also what R2 used.
 
 ===Object cloning, multiple inheritance
 
 This is the case when an expression like
 
-	make object1 object2
+	make bject1 object2
 
-is evaluated, producing an object that should be a clone of both OBJECT1 and OBJECT2. In this case I also prefer rebinding as the most correct and fast solution. Also, the deepversus shallow copy/bind shall be solved the same way as for single inheritance.
+is evaluated, producing an object that should be a clone of both OBJECT1 and OBJECT2.
+
+In this case I also prefer rebinding as the most correct solution. Also, the deep versus shallow copy/bind shall be solved similarly as for single inheritance.
