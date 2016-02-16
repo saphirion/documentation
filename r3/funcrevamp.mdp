@@ -133,7 +133,7 @@ I prefer the former alternative, it is the one users expect, it is also what R2 
 
 This is the case when an expression like
 
-	make bject1 object2
+	make object1 object2
 
 is evaluated, producing an object that should be a clone of both OBJECT1 and OBJECT2.
 
